@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kirill Kuznetsov — CV Quest</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <title>Kirill Kuznetsov — CV World</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,25 +13,24 @@
         }
 
         body {
-            background: #1a1a2e;
+            background: #0f0f23;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: 'Press Start 2P', cursive;
+            font-family: 'Inter', sans-serif;
             overflow: hidden;
         }
 
-        .game-container {
+        .game-wrapper {
             position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
-        .game-header {
+        .game-title {
+            font-family: 'Press Start 2P', cursive;
             color: #ffd700;
-            font-size: 14px;
+            font-size: 16px;
+            text-align: center;
             margin-bottom: 10px;
             text-shadow: 2px 2px #000;
         }
@@ -39,1101 +38,545 @@
         #gameCanvas {
             border: 4px solid #ffd700;
             border-radius: 8px;
-            image-rendering: pixelated;
-            cursor: pointer;
+            display: block;
         }
 
-        .controls-hint {
-            color: #888;
+        .controls {
+            font-family: 'Press Start 2P', cursive;
+            color: #666;
             font-size: 8px;
-            margin-top: 15px;
             text-align: center;
+            margin-top: 10px;
         }
 
-        .controls-hint span {
+        .controls span {
             color: #ffd700;
         }
 
-        /* Dialog Box */
-        .dialog-box {
+        /* Collectible counter */
+        .collectibles {
             position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 700px;
-            background: rgba(0, 0, 0, 0.95);
-            border: 4px solid #ffd700;
-            border-radius: 8px;
-            padding: 20px;
-            display: none;
-            z-index: 100;
-        }
-
-        .dialog-box.active {
-            display: block;
-            animation: dialogAppear 0.2s ease;
-        }
-
-        @keyframes dialogAppear {
-            from { transform: translateX(-50%) scale(0.9); opacity: 0; }
-            to { transform: translateX(-50%) scale(1); opacity: 1; }
-        }
-
-        .dialog-speaker {
-            color: #ffd700;
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-
-        .dialog-text {
-            color: #fff;
-            font-size: 10px;
-            line-height: 1.8;
-            min-height: 60px;
-        }
-
-        .dialog-continue {
-            color: #888;
-            font-size: 8px;
-            margin-top: 15px;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-
-        /* Mini Map */
-        .mini-map {
-            position: absolute;
-            top: 60px;
-            right: 20px;
-            width: 150px;
-            height: 150px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #ffd700;
-            border-radius: 4px;
-        }
-
-        /* Location Label */
-        .location-label {
-            position: absolute;
-            top: 60px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #ffd700;
-            border-radius: 4px;
+            top: 15px;
+            left: 15px;
+            background: rgba(0,0,0,0.8);
             padding: 10px 15px;
-            color: #ffd700;
+            border-radius: 8px;
+            border: 2px solid #ffd700;
+            font-family: 'Press Start 2P', cursive;
             font-size: 10px;
-        }
-
-        /* Interaction Hint */
-        .interaction-hint {
-            position: absolute;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid #00ff88;
-            border-radius: 4px;
-            padding: 8px 15px;
-            color: #00ff88;
-            font-size: 8px;
-            display: none;
-            animation: pulse 1s infinite;
-        }
-
-        .interaction-hint.active {
-            display: block;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: translateX(-50%) scale(1); }
-            50% { transform: translateX(-50%) scale(1.05); }
-        }
-
-        /* Loading Screen */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #1a1a2e;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s;
-        }
-
-        .loading-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .loading-title {
             color: #ffd700;
-            font-size: 24px;
-            margin-bottom: 30px;
-            text-shadow: 3px 3px #000;
         }
 
-        .loading-bar {
-            width: 300px;
-            height: 20px;
-            background: #333;
+        /* Secret found popup */
+        .secret-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(0,0,0,0.95);
+            padding: 30px 50px;
+            border-radius: 15px;
             border: 3px solid #ffd700;
-            border-radius: 4px;
-            overflow: hidden;
+            text-align: center;
+            z-index: 1000;
+            transition: transform 0.3s ease;
         }
 
-        .loading-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #ff6b6b, #ffd700, #00ff88);
-            transition: width 0.3s;
+        .secret-popup.show {
+            transform: translate(-50%, -50%) scale(1);
         }
 
-        .loading-text {
-            color: #888;
+        .secret-popup h2 {
+            font-family: 'Press Start 2P', cursive;
+            color: #ffd700;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .secret-popup p {
+            color: #fff;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .secret-popup .close-hint {
+            color: #666;
             font-size: 10px;
             margin-top: 20px;
-        }
-
-        .start-button {
-            margin-top: 30px;
-            padding: 15px 40px;
-            background: #ffd700;
-            border: none;
-            border-radius: 4px;
-            color: #1a1a2e;
             font-family: 'Press Start 2P', cursive;
-            font-size: 12px;
-            cursor: pointer;
-            display: none;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .start-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-
-        .start-button.visible {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <h1 class="loading-title">CV QUEST</h1>
-        <div class="loading-bar">
-            <div class="loading-fill" id="loadingFill"></div>
+    <div class="game-wrapper">
+        <h1 class="game-title">KIRILL KUZNETSOV</h1>
+        <canvas id="gameCanvas" width="900" height="650"></canvas>
+        <p class="controls"><span>WASD</span> or <span>ARROWS</span> to explore</p>
+
+        <div class="collectibles" id="collectibles">Stars: 0/5</div>
+
+        <div class="secret-popup" id="secretPopup">
+            <h2>SECRET FOUND!</h2>
+            <p id="secretText"></p>
+            <p class="close-hint">Press any key</p>
         </div>
-        <p class="loading-text" id="loadingText">Loading world...</p>
-        <button class="start-button" id="startButton">START GAME</button>
-    </div>
-
-    <div class="game-container">
-        <h1 class="game-header">KIRILL KUZNETSOV — CV QUEST</h1>
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-
-        <div class="location-label" id="locationLabel">🏠 SPAWN POINT</div>
-
-        <canvas class="mini-map" id="miniMap" width="150" height="150"></canvas>
-
-        <div class="interaction-hint" id="interactionHint">Press SPACE or E to interact</div>
-
-        <div class="dialog-box" id="dialogBox">
-            <div class="dialog-speaker" id="dialogSpeaker">???</div>
-            <div class="dialog-text" id="dialogText"></div>
-            <div class="dialog-continue">Press SPACE to continue...</div>
-        </div>
-
-        <p class="controls-hint">
-            <span>WASD</span> or <span>ARROWS</span> to move |
-            <span>SPACE</span> or <span>E</span> to interact |
-            <span>ESC</span> to close dialog
-        </p>
     </div>
 
     <script>
-        // ============== GAME CONFIG ==============
-        const TILE_SIZE = 32;
-        const MAP_WIDTH = 40;
-        const MAP_HEIGHT = 30;
-        const PLAYER_SPEED = 3;
-
-        // Tile types
-        const TILES = {
-            GRASS: 0,
-            WATER: 1,
-            PATH: 2,
-            TREE: 3,
-            BUILDING_WALL: 4,
-            BUILDING_DOOR: 5,
-            FLOWER: 6,
-            ROCK: 7,
-            BRIDGE: 8,
-            SAND: 9
-        };
-
-        // Colors for tiles
-        const TILE_COLORS = {
-            [TILES.GRASS]: '#2d5a27',
-            [TILES.WATER]: '#1e90ff',
-            [TILES.PATH]: '#c9a66b',
-            [TILES.TREE]: '#1a4d1a',
-            [TILES.BUILDING_WALL]: '#8b4513',
-            [TILES.BUILDING_DOOR]: '#daa520',
-            [TILES.FLOWER]: '#2d5a27',
-            [TILES.ROCK]: '#696969',
-            [TILES.BRIDGE]: '#8b7355',
-            [TILES.SAND]: '#f4d03f'
-        };
-
-        // Locations on the map
-        const LOCATIONS = {
-            SPAWN: { x: 20, y: 15, name: '🏠 HOME', color: '#ffd700' },
-            UNIVERSITY: { x: 8, y: 6, name: '🎓 UNIVERSITY', color: '#ff6b6b' },
-            CSC: { x: 32, y: 6, name: '📊 CS CENTER', color: '#4ecdc4' },
-            YSDA: { x: 8, y: 24, name: '🔮 YSDA', color: '#a855f7' },
-            PROJECTS: { x: 32, y: 24, name: '🗡️ PROJECTS LAB', color: '#f97316' },
-            SKILLS: { x: 20, y: 6, name: '⚔️ SKILL FORGE', color: '#06b6d4' },
-            CONTACT: { x: 20, y: 24, name: '📬 POST OFFICE', color: '#ec4899' }
-        };
-
-        // NPCs and interactive objects
-        const NPCS = [
-            {
-                id: 'professor',
-                x: 8, y: 8,
-                sprite: '👨‍🏫',
-                name: 'Professor',
-                location: 'UNIVERSITY',
-                dialogs: [
-                    "Welcome to Saint-Petersburg State University!",
-                    "Kirill studied here from 2019 to 2023.",
-                    "He earned a Bachelor's degree in Mathematics and Computer Sciences.",
-                    "Specialized in 'Mathematics, Algorithms and Data Analysis'.",
-                    "A brilliant student with a passion for algorithmic thinking!"
-                ]
-            },
-            {
-                id: 'data_scientist',
-                x: 32, y: 8,
-                sprite: '👩‍💻',
-                name: 'Data Scientist',
-                location: 'CSC',
-                dialogs: [
-                    "This is the Computer Science Center!",
-                    "Kirill completed the Data Science program here in 2021-2022.",
-                    "He mastered Python, machine learning, and data analysis.",
-                    "The training was intense but incredibly valuable!",
-                    "Many top tech specialists come from this program."
-                ]
-            },
-            {
-                id: 'yandex_mentor',
-                x: 8, y: 22,
-                sprite: '🧙‍♂️',
-                name: 'YSDA Mentor',
-                location: 'YSDA',
-                dialogs: [
-                    "Welcome to Yandex School of Data Analysis!",
-                    "Kirill studied Big Data Infrastructure here from 2022 to 2024.",
-                    "YSDA is one of the most prestigious data science schools.",
-                    "Here he learned to build scalable data pipelines.",
-                    "Working with massive datasets became his specialty!"
-                ]
-            },
-            {
-                id: 'blacksmith',
-                x: 20, y: 8,
-                sprite: '⚒️',
-                name: 'Skill Master',
-                location: 'SKILLS',
-                dialogs: [
-                    "Welcome to the Skill Forge!",
-                    "Let me tell you about Kirill's abilities...",
-                    "🐍 PYTHON — Level 90/100 — His primary weapon!",
-                    "⚔️ C/C++ — Level 80/100 — For performance-critical tasks.",
-                    "🗃️ PostgreSQL — Level 75/100 — Database mastery.",
-                    "🤖 Machine Learning — Level 85/100 — AI sorcery!",
-                    "📊 Data Analysis — Level 80/100 — Finding insights in data.",
-                    "🌐 Languages: Russian (native), English (intermediate)"
-                ]
-            },
-            {
-                id: 'quest_giver',
-                x: 32, y: 22,
-                sprite: '📜',
-                name: 'Quest Master',
-                location: 'PROJECTS',
-                dialogs: [
-                    "Ah, you want to hear about completed quests?",
-                    "🤖 PROTOCOL DETECTION BOT (Spring 2022)",
-                    "   Built an OCR system for table recognition!",
-                    "   Conquered handwritten digit classification.",
-                    "🧭 BOUNDED SUBOPTIMAL ALGORITHMS (Autumn 2022)",
-                    "   Implemented the EES algorithm with priority functions.",
-                    "   Explored the depths of search optimization!",
-                    "🗺️ RRT* PATH PLANNING (Autumn 2021)",
-                    "   Created path planning with real-time visualization.",
-                    "📜 ACADEMIC RESEARCH (2018-2019)",
-                    "   Published on arXiv: research on subquandles!",
-                    "   arxiv.org/abs/1904.06571"
-                ]
-            },
-            {
-                id: 'postman',
-                x: 20, y: 22,
-                sprite: '📮',
-                name: 'Messenger',
-                location: 'CONTACT',
-                dialogs: [
-                    "Need to send a raven to Kirill?",
-                    "📧 Email: kirill.kz20010@gmail.com",
-                    "💻 GitHub: github.com/bicikar",
-                    "📱 Phone: +7 (931) 592-3423",
-                    "📍 Location: Saint-Petersburg, Russia",
-                    "Feel free to reach out for collaboration!"
-                ]
-            },
-            {
-                id: 'home_sign',
-                x: 20, y: 13,
-                sprite: '🏠',
-                name: 'Welcome Sign',
-                location: 'SPAWN',
-                dialogs: [
-                    "Welcome to Kirill's CV Quest!",
-                    "Explore the map to learn about Kirill Kuznetsov.",
-                    "Visit different locations to discover:",
-                    "🎓 Education history",
-                    "⚔️ Technical skills",
-                    "🗡️ Completed projects",
-                    "📬 Contact information",
-                    "Use WASD or Arrow keys to move around!",
-                    "Good luck on your adventure!"
-                ]
-            }
-        ];
-
-        // ============== GAME STATE ==============
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const miniMapCanvas = document.getElementById('miniMap');
-        const miniMapCtx = miniMapCanvas.getContext('2d');
 
-        let gameStarted = false;
-        let map = [];
-        let camera = { x: 0, y: 0 };
-        let currentDialog = null;
-        let dialogIndex = 0;
-        let nearbyNPC = null;
-        let typingText = '';
-        let typingIndex = 0;
-        let typingInterval = null;
+        // Game state
+        const player = { x: 450, y: 520, size: 20, speed: 4 };
+        const keys = { up: false, down: false, left: false, right: false };
+        let collectedStars = 0;
+        let showingSecret = false;
 
-        const player = {
-            x: LOCATIONS.SPAWN.x * TILE_SIZE,
-            y: LOCATIONS.SPAWN.y * TILE_SIZE,
-            width: 28,
-            height: 28,
-            direction: 'down',
-            frame: 0,
-            moving: false
+        // Color palette
+        const colors = {
+            grass: '#1a472a',
+            grassLight: '#2d5a3d',
+            path: '#c9a66b',
+            pathDark: '#a8885a',
+            water: '#1e5799',
+            waterLight: '#3a7bd5',
+            building: '#4a3728',
+            roof: '#8b0000',
+            wood: '#654321',
+            gold: '#ffd700',
+            text: '#ffffff',
+            textDark: '#333333'
         };
 
-        const keys = {
-            up: false,
-            down: false,
-            left: false,
-            right: false
-        };
+        // Signs with CV information (positioned on map)
+        const signs = [
+            // Title area
+            { x: 450, y: 80, text: 'DATA ENGINEER', size: 24, color: '#ffd700', font: 'Press Start 2P' },
+            { x: 450, y: 110, text: 'Saint-Petersburg, Russia', size: 14, color: '#aaa' },
 
-        // ============== MAP GENERATION ==============
-        function generateMap() {
-            // Initialize with grass
-            for (let y = 0; y < MAP_HEIGHT; y++) {
-                map[y] = [];
-                for (let x = 0; x < MAP_WIDTH; x++) {
-                    map[y][x] = TILES.GRASS;
-                }
-            }
+            // Education zone (left side)
+            { x: 120, y: 180, text: 'EDUCATION', size: 16, color: '#ff6b6b', font: 'Press Start 2P' },
 
-            // Add water borders
-            for (let x = 0; x < MAP_WIDTH; x++) {
-                map[0][x] = TILES.WATER;
-                map[1][x] = TILES.WATER;
-                map[MAP_HEIGHT-1][x] = TILES.WATER;
-                map[MAP_HEIGHT-2][x] = TILES.WATER;
-            }
-            for (let y = 0; y < MAP_HEIGHT; y++) {
-                map[y][0] = TILES.WATER;
-                map[y][1] = TILES.WATER;
-                map[y][MAP_WIDTH-1] = TILES.WATER;
-                map[y][MAP_WIDTH-2] = TILES.WATER;
-            }
+            { x: 120, y: 230, text: 'SPbU', size: 14, color: '#ffd700', font: 'Press Start 2P' },
+            { x: 120, y: 255, text: "Bachelor's Degree", size: 12, color: '#fff' },
+            { x: 120, y: 275, text: 'Mathematics & CS', size: 11, color: '#ccc' },
+            { x: 120, y: 295, text: '2019 — 2023', size: 10, color: '#888' },
 
-            // Add paths connecting locations
-            // Horizontal main path
-            for (let x = 3; x < MAP_WIDTH - 3; x++) {
-                map[15][x] = TILES.PATH;
-                map[14][x] = TILES.PATH;
-            }
-            // Vertical paths
-            for (let y = 3; y < MAP_HEIGHT - 3; y++) {
-                map[y][20] = TILES.PATH;
-                map[y][8] = TILES.PATH;
-                map[y][32] = TILES.PATH;
-            }
-            // Horizontal connections
-            for (let x = 3; x < MAP_WIDTH - 3; x++) {
-                map[6][x] = TILES.PATH;
-                map[24][x] = TILES.PATH;
-            }
+            { x: 120, y: 350, text: 'CS CENTER', size: 14, color: '#ffd700', font: 'Press Start 2P' },
+            { x: 120, y: 375, text: 'Data Science Program', size: 12, color: '#fff' },
+            { x: 120, y: 395, text: '2021 — 2022', size: 10, color: '#888' },
 
-            // Add trees around the map
-            const treePositions = [];
-            for (let i = 0; i < 80; i++) {
-                const x = Math.floor(Math.random() * (MAP_WIDTH - 6)) + 3;
-                const y = Math.floor(Math.random() * (MAP_HEIGHT - 6)) + 3;
-                if (map[y][x] === TILES.GRASS && !isNearLocation(x, y) && !isNearPath(x, y)) {
-                    map[y][x] = TILES.TREE;
-                    treePositions.push({x, y});
-                }
-            }
+            { x: 120, y: 450, text: 'YSDA', size: 14, color: '#ffd700', font: 'Press Start 2P' },
+            { x: 120, y: 475, text: 'Big Data Infrastructure', size: 12, color: '#fff' },
+            { x: 120, y: 495, text: 'Yandex School', size: 11, color: '#ccc' },
+            { x: 120, y: 515, text: '2022 — 2024', size: 10, color: '#888' },
 
-            // Add flowers
-            for (let i = 0; i < 40; i++) {
-                const x = Math.floor(Math.random() * (MAP_WIDTH - 6)) + 3;
-                const y = Math.floor(Math.random() * (MAP_HEIGHT - 6)) + 3;
-                if (map[y][x] === TILES.GRASS && !isNearLocation(x, y)) {
-                    map[y][x] = TILES.FLOWER;
-                }
-            }
+            // Skills zone (center)
+            { x: 450, y: 180, text: 'SKILLS', size: 16, color: '#4ecdc4', font: 'Press Start 2P' },
 
-            // Add rocks
-            for (let i = 0; i < 20; i++) {
-                const x = Math.floor(Math.random() * (MAP_WIDTH - 6)) + 3;
-                const y = Math.floor(Math.random() * (MAP_HEIGHT - 6)) + 3;
-                if (map[y][x] === TILES.GRASS && !isNearLocation(x, y)) {
-                    map[y][x] = TILES.ROCK;
-                }
-            }
+            { x: 350, y: 240, text: 'Python', size: 13, color: '#fff' },
+            { x: 350, y: 290, text: 'C / C++', size: 13, color: '#fff' },
+            { x: 350, y: 340, text: 'PostgreSQL', size: 13, color: '#fff' },
 
-            // Add buildings at locations
-            Object.entries(LOCATIONS).forEach(([key, loc]) => {
-                if (key !== 'SPAWN') {
-                    addBuilding(loc.x - 2, loc.y - 2, 5, 4);
-                }
+            { x: 550, y: 240, text: 'Machine Learning', size: 13, color: '#fff' },
+            { x: 550, y: 290, text: 'Data Analysis', size: 13, color: '#fff' },
+            { x: 550, y: 340, text: 'Algorithms', size: 13, color: '#fff' },
+
+            // Projects zone (right side)
+            { x: 780, y: 180, text: 'PROJECTS', size: 16, color: '#f97316', font: 'Press Start 2P' },
+
+            { x: 780, y: 240, text: 'Protocol Detection Bot', size: 12, color: '#fff' },
+            { x: 780, y: 260, text: 'OCR & Digit Recognition', size: 10, color: '#aaa' },
+
+            { x: 780, y: 310, text: 'RRT* Path Planning', size: 12, color: '#fff' },
+            { x: 780, y: 330, text: 'Algorithm Visualization', size: 10, color: '#aaa' },
+
+            { x: 780, y: 380, text: 'EES Algorithm', size: 12, color: '#fff' },
+            { x: 780, y: 400, text: 'Suboptimal Search', size: 10, color: '#aaa' },
+
+            { x: 780, y: 450, text: 'Research Paper', size: 12, color: '#fff' },
+            { x: 780, y: 470, text: 'arxiv.org/abs/1904.06571', size: 9, color: '#4ecdc4' },
+
+            // Contact zone (bottom)
+            { x: 450, y: 580, text: 'kirill.kz20010@gmail.com', size: 11, color: '#4ecdc4' },
+            { x: 450, y: 605, text: 'github.com/bicikar', size: 11, color: '#aaa' },
+        ];
+
+        // Skill bars
+        const skillBars = [
+            { x: 350, y: 250, width: 80, level: 0.9, color: '#3498db' },  // Python
+            { x: 350, y: 300, width: 80, level: 0.8, color: '#e74c3c' },  // C++
+            { x: 350, y: 350, width: 80, level: 0.75, color: '#2ecc71' }, // PostgreSQL
+            { x: 550, y: 250, width: 80, level: 0.85, color: '#9b59b6' }, // ML
+            { x: 550, y: 300, width: 80, level: 0.8, color: '#f39c12' },  // Data Analysis
+            { x: 550, y: 350, width: 80, level: 0.7, color: '#1abc9c' },  // Algorithms
+        ];
+
+        // Collectible stars
+        const stars = [
+            { x: 50, y: 150, collected: false },
+            { x: 850, y: 150, collected: false },
+            { x: 450, y: 400, collected: false },
+            { x: 50, y: 550, collected: false },
+            { x: 850, y: 550, collected: false },
+        ];
+
+        // Secret chest
+        const chest = { x: 780, y: 520, opened: false, width: 40, height: 30 };
+
+        // Decorative elements
+        const trees = [
+            { x: 30, y: 80 }, { x: 70, y: 120 }, { x: 200, y: 100 },
+            { x: 700, y: 90 }, { x: 830, y: 80 }, { x: 870, y: 130 },
+            { x: 20, y: 400 }, { x: 250, y: 550 }, { x: 650, y: 550 },
+        ];
+
+        const flowers = [];
+        for (let i = 0; i < 30; i++) {
+            flowers.push({
+                x: Math.random() * 860 + 20,
+                y: Math.random() * 400 + 130,
+                color: ['#ff6b6b', '#ffd700', '#ff69b4', '#fff', '#4ecdc4'][Math.floor(Math.random() * 5)]
             });
         }
 
-        function addBuilding(startX, startY, width, height) {
-            for (let y = startY; y < startY + height; y++) {
-                for (let x = startX; x < startX + width; x++) {
-                    if (y >= 0 && y < MAP_HEIGHT && x >= 0 && x < MAP_WIDTH) {
-                        map[y][x] = TILES.BUILDING_WALL;
-                    }
+        // Zones for visual separation
+        const zones = [
+            { x: 20, y: 160, w: 200, h: 400, color: 'rgba(255, 107, 107, 0.1)', border: '#ff6b6b' },  // Education
+            { x: 280, y: 160, w: 340, h: 220, color: 'rgba(78, 205, 196, 0.1)', border: '#4ecdc4' },  // Skills
+            { x: 680, y: 160, w: 200, h: 360, color: 'rgba(249, 115, 22, 0.1)', border: '#f97316' },  // Projects
+        ];
+
+        // Draw functions
+        function drawBackground() {
+            // Base grass
+            ctx.fillStyle = colors.grass;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grass texture
+            ctx.fillStyle = colors.grassLight;
+            for (let i = 0; i < 200; i++) {
+                const x = (i * 47) % canvas.width;
+                const y = (i * 31) % canvas.height;
+                ctx.fillRect(x, y, 3, 8);
+            }
+
+            // Main path
+            ctx.fillStyle = colors.path;
+            ctx.fillRect(0, 550, canvas.width, 40);
+            ctx.fillRect(420, 130, 60, 420);
+
+            // Path texture
+            ctx.fillStyle = colors.pathDark;
+            for (let i = 0; i < 50; i++) {
+                ctx.fillRect(i * 20, 555, 8, 5);
+                ctx.fillRect(i * 20 + 5, 575, 6, 4);
+            }
+        }
+
+        function drawZones() {
+            zones.forEach(zone => {
+                ctx.fillStyle = zone.color;
+                ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+                ctx.strokeStyle = zone.border;
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.strokeRect(zone.x, zone.y, zone.w, zone.h);
+                ctx.setLineDash([]);
+            });
+        }
+
+        function drawTrees() {
+            trees.forEach(tree => {
+                // Trunk
+                ctx.fillStyle = '#5d4037';
+                ctx.fillRect(tree.x + 8, tree.y + 20, 10, 15);
+                // Leaves
+                ctx.fillStyle = '#2e7d32';
+                ctx.beginPath();
+                ctx.arc(tree.x + 13, tree.y + 12, 18, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#388e3c';
+                ctx.beginPath();
+                ctx.arc(tree.x + 8, tree.y + 8, 12, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function drawFlowers() {
+            flowers.forEach(flower => {
+                // Skip if in zones
+                const inZone = zones.some(z =>
+                    flower.x > z.x && flower.x < z.x + z.w &&
+                    flower.y > z.y && flower.y < z.y + z.h
+                );
+                if (inZone) return;
+
+                ctx.fillStyle = flower.color;
+                ctx.beginPath();
+                ctx.arc(flower.x, flower.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function drawSigns() {
+            signs.forEach(sign => {
+                ctx.font = `${sign.font ? '' : ''}${sign.size}px ${sign.font || 'Inter'}`;
+                ctx.fillStyle = sign.color;
+                ctx.textAlign = 'center';
+                ctx.fillText(sign.text, sign.x, sign.y);
+            });
+        }
+
+        function drawSkillBars() {
+            skillBars.forEach(bar => {
+                // Background
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.fillRect(bar.x, bar.y, bar.width, 12);
+                // Fill
+                ctx.fillStyle = bar.color;
+                ctx.fillRect(bar.x, bar.y, bar.width * bar.level, 12);
+                // Border
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(bar.x, bar.y, bar.width, 12);
+                // Percentage
+                ctx.font = '10px Inter';
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'left';
+                ctx.fillText(`${Math.round(bar.level * 100)}%`, bar.x + bar.width + 5, bar.y + 10);
+            });
+        }
+
+        function drawStars() {
+            const time = Date.now() / 500;
+            stars.forEach((star, i) => {
+                if (star.collected) return;
+
+                const bounce = Math.sin(time + i) * 3;
+                const size = 15;
+
+                // Glow
+                ctx.beginPath();
+                ctx.arc(star.x, star.y + bounce, size + 5, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
+                ctx.fill();
+
+                // Star shape
+                ctx.fillStyle = '#ffd700';
+                ctx.beginPath();
+                for (let j = 0; j < 5; j++) {
+                    const angle = (j * 4 * Math.PI) / 5 - Math.PI / 2;
+                    const x = star.x + Math.cos(angle) * size;
+                    const y = star.y + bounce + Math.sin(angle) * size;
+                    if (j === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
                 }
-            }
-            // Add door
-            const doorX = startX + Math.floor(width / 2);
-            const doorY = startY + height - 1;
-            if (doorY < MAP_HEIGHT) {
-                map[doorY][doorX] = TILES.BUILDING_DOOR;
-            }
+                ctx.closePath();
+                ctx.fill();
+
+                // Inner
+                ctx.fillStyle = '#ffeb3b';
+                ctx.beginPath();
+                ctx.arc(star.x, star.y + bounce, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
         }
 
-        function isNearLocation(x, y) {
-            return Object.values(LOCATIONS).some(loc =>
-                Math.abs(x - loc.x) < 4 && Math.abs(y - loc.y) < 4
-            );
-        }
+        function drawChest() {
+            const x = chest.x;
+            const y = chest.y;
 
-        function isNearPath(x, y) {
-            for (let dy = -1; dy <= 1; dy++) {
-                for (let dx = -1; dx <= 1; dx++) {
-                    const ny = y + dy;
-                    const nx = x + dx;
-                    if (ny >= 0 && ny < MAP_HEIGHT && nx >= 0 && nx < MAP_WIDTH) {
-                        if (map[ny][nx] === TILES.PATH) return true;
-                    }
-                }
-            }
-            return false;
-        }
+            // Shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(x - 2, y + 25, 44, 8);
 
-        function isWalkable(x, y) {
-            const tileX = Math.floor(x / TILE_SIZE);
-            const tileY = Math.floor(y / TILE_SIZE);
+            if (chest.opened) {
+                // Open chest
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(x, y + 10, 40, 20);
+                // Lid open
+                ctx.fillStyle = '#A0522D';
+                ctx.fillRect(x - 2, y - 5, 44, 15);
+                // Gold inside
+                ctx.fillStyle = '#ffd700';
+                ctx.beginPath();
+                ctx.arc(x + 12, y + 18, 5, 0, Math.PI * 2);
+                ctx.arc(x + 22, y + 16, 4, 0, Math.PI * 2);
+                ctx.arc(x + 30, y + 18, 5, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // Closed chest
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(x, y, 40, 30);
+                // Lid
+                ctx.fillStyle = '#A0522D';
+                ctx.fillRect(x - 2, y - 5, 44, 12);
+                // Lock
+                ctx.fillStyle = '#ffd700';
+                ctx.fillRect(x + 16, y + 8, 8, 10);
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(x + 20, y + 14, 2, 0, Math.PI * 2);
+                ctx.fill();
 
-            if (tileX < 0 || tileX >= MAP_WIDTH || tileY < 0 || tileY >= MAP_HEIGHT) {
-                return false;
-            }
-
-            const tile = map[tileY][tileX];
-            return tile !== TILES.WATER &&
-                   tile !== TILES.TREE &&
-                   tile !== TILES.BUILDING_WALL &&
-                   tile !== TILES.ROCK;
-        }
-
-        // ============== RENDERING ==============
-        function drawTile(x, y, tile) {
-            const screenX = x * TILE_SIZE - camera.x;
-            const screenY = y * TILE_SIZE - camera.y;
-
-            // Skip if off screen
-            if (screenX < -TILE_SIZE || screenX > canvas.width ||
-                screenY < -TILE_SIZE || screenY > canvas.height) {
-                return;
-            }
-
-            ctx.fillStyle = TILE_COLORS[tile];
-            ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-
-            // Add details
-            switch(tile) {
-                case TILES.GRASS:
-                    // Random grass blades
-                    ctx.fillStyle = '#3d7a37';
-                    if ((x + y) % 3 === 0) {
-                        ctx.fillRect(screenX + 5, screenY + 10, 2, 8);
-                        ctx.fillRect(screenX + 20, screenY + 15, 2, 6);
-                    }
-                    break;
-
-                case TILES.WATER:
-                    // Water waves
-                    ctx.fillStyle = '#4aa8ff';
-                    const waveOffset = Math.sin(Date.now() / 500 + x + y) * 3;
-                    ctx.fillRect(screenX + 5, screenY + 10 + waveOffset, 10, 3);
-                    ctx.fillRect(screenX + 18, screenY + 20 + waveOffset, 8, 3);
-                    break;
-
-                case TILES.PATH:
-                    // Path texture
-                    ctx.fillStyle = '#b8956b';
-                    ctx.fillRect(screenX + 3, screenY + 3, 4, 4);
-                    ctx.fillRect(screenX + 15, screenY + 12, 5, 5);
-                    ctx.fillRect(screenX + 25, screenY + 5, 3, 3);
-                    break;
-
-                case TILES.TREE:
-                    // Tree trunk
-                    ctx.fillStyle = '#5d4037';
-                    ctx.fillRect(screenX + 12, screenY + 18, 8, 14);
-                    // Tree top
-                    ctx.fillStyle = '#2e7d32';
-                    ctx.beginPath();
-                    ctx.arc(screenX + 16, screenY + 12, 14, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#388e3c';
-                    ctx.beginPath();
-                    ctx.arc(screenX + 12, screenY + 8, 8, 0, Math.PI * 2);
-                    ctx.fill();
-                    break;
-
-                case TILES.BUILDING_WALL:
-                    // Brick pattern
-                    ctx.fillStyle = '#a0522d';
-                    ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-                    ctx.strokeStyle = '#6b3a1f';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(screenX + 2, screenY + 2, 12, 8);
-                    ctx.strokeRect(screenX + 16, screenY + 2, 12, 8);
-                    ctx.strokeRect(screenX + 8, screenY + 12, 12, 8);
-                    ctx.strokeRect(screenX + 2, screenY + 22, 12, 8);
-                    ctx.strokeRect(screenX + 22, screenY + 22, 8, 8);
-                    // Roof hint at top
-                    if (y > 0 && map[y-1] && map[y-1][x] !== TILES.BUILDING_WALL) {
-                        ctx.fillStyle = '#8b0000';
-                        ctx.fillRect(screenX - 2, screenY - 4, TILE_SIZE + 4, 6);
-                    }
-                    break;
-
-                case TILES.BUILDING_DOOR:
-                    // Door
-                    ctx.fillStyle = '#a0522d';
-                    ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-                    ctx.fillStyle = '#daa520';
-                    ctx.fillRect(screenX + 8, screenY + 4, 16, 28);
-                    ctx.fillStyle = '#b8860b';
-                    ctx.fillRect(screenX + 10, screenY + 6, 12, 24);
-                    // Door knob
+                // Hint if player nearby
+                const dist = Math.sqrt(Math.pow(player.x - x - 20, 2) + Math.pow(player.y - y - 15, 2));
+                if (dist < 60) {
+                    ctx.font = '10px Press Start 2P';
                     ctx.fillStyle = '#ffd700';
-                    ctx.beginPath();
-                    ctx.arc(screenX + 18, screenY + 18, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                    break;
-
-                case TILES.FLOWER:
-                    // Base grass
-                    ctx.fillStyle = '#2d5a27';
-                    ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-                    // Flowers
-                    const colors = ['#ff6b6b', '#ffd700', '#ff69b4', '#fff'];
-                    ctx.fillStyle = colors[(x + y) % colors.length];
-                    ctx.beginPath();
-                    ctx.arc(screenX + 10, screenY + 12, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = colors[(x + y + 1) % colors.length];
-                    ctx.beginPath();
-                    ctx.arc(screenX + 22, screenY + 20, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                    break;
-
-                case TILES.ROCK:
-                    // Rock
-                    ctx.fillStyle = '#2d5a27';
-                    ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-                    ctx.fillStyle = '#808080';
-                    ctx.beginPath();
-                    ctx.ellipse(screenX + 16, screenY + 20, 12, 8, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#a0a0a0';
-                    ctx.beginPath();
-                    ctx.ellipse(screenX + 14, screenY + 18, 8, 5, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    break;
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Press SPACE', x + 20, y - 20);
+                }
             }
         }
 
         function drawPlayer() {
-            const screenX = player.x - camera.x;
-            const screenY = player.y - camera.y;
+            const bounce = Math.sin(Date.now() / 150) * (keys.up || keys.down || keys.left || keys.right ? 2 : 0);
 
             // Shadow
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
             ctx.beginPath();
-            ctx.ellipse(screenX + 14, screenY + 30, 12, 4, 0, 0, Math.PI * 2);
+            ctx.ellipse(player.x, player.y + 12, 12, 5, 0, 0, Math.PI * 2);
             ctx.fill();
 
             // Body
             ctx.fillStyle = '#4a90d9';
-            ctx.fillRect(screenX + 6, screenY + 14, 16, 14);
+            ctx.fillRect(player.x - 8, player.y - 8 + bounce, 16, 16);
 
             // Head
             ctx.fillStyle = '#ffdbac';
-            ctx.fillRect(screenX + 8, screenY + 4, 12, 12);
+            ctx.fillRect(player.x - 6, player.y - 18 + bounce, 12, 12);
 
             // Hair
             ctx.fillStyle = '#4a3728';
-            ctx.fillRect(screenX + 7, screenY + 2, 14, 6);
+            ctx.fillRect(player.x - 7, player.y - 20 + bounce, 14, 5);
 
             // Eyes
             ctx.fillStyle = '#000';
-            if (player.direction === 'up') {
-                // Looking up - no eyes visible
-            } else {
-                ctx.fillRect(screenX + 10, screenY + 8, 2, 2);
-                ctx.fillRect(screenX + 16, screenY + 8, 2, 2);
-            }
-
-            // Direction indicator (cape/back detail)
-            ctx.fillStyle = '#ffd700';
-            switch(player.direction) {
-                case 'down':
-                    ctx.fillRect(screenX + 10, screenY + 14, 8, 2);
-                    break;
-                case 'up':
-                    ctx.fillRect(screenX + 6, screenY + 16, 4, 10);
-                    ctx.fillRect(screenX + 18, screenY + 16, 4, 10);
-                    break;
-                case 'left':
-                    ctx.fillRect(screenX + 18, screenY + 14, 4, 12);
-                    break;
-                case 'right':
-                    ctx.fillRect(screenX + 6, screenY + 14, 4, 12);
-                    break;
-            }
-
-            // Legs with walking animation
-            ctx.fillStyle = '#2c3e50';
-            const legOffset = player.moving ? Math.sin(Date.now() / 100) * 3 : 0;
-            ctx.fillRect(screenX + 8, screenY + 26 + legOffset, 4, 6);
-            ctx.fillRect(screenX + 16, screenY + 26 - legOffset, 4, 6);
+            ctx.fillRect(player.x - 4, player.y - 14 + bounce, 2, 2);
+            ctx.fillRect(player.x + 2, player.y - 14 + bounce, 2, 2);
         }
 
-        function drawNPCs() {
-            NPCS.forEach(npc => {
-                const screenX = npc.x * TILE_SIZE - camera.x;
-                const screenY = npc.y * TILE_SIZE - camera.y;
+        function drawTitle() {
+            // Name plate at top
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillRect(300, 40, 300, 90);
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(300, 40, 300, 90);
 
-                if (screenX < -TILE_SIZE || screenX > canvas.width ||
-                    screenY < -TILE_SIZE || screenY > canvas.height) {
-                    return;
-                }
-
-                // NPC sprite (emoji)
-                ctx.font = '28px Arial';
-                ctx.fillText(npc.sprite, screenX + 2, screenY + 28);
-
-                // Floating animation
-                const floatOffset = Math.sin(Date.now() / 500 + npc.x) * 2;
-
-                // Exclamation mark if nearby
-                if (nearbyNPC && nearbyNPC.id === npc.id && !currentDialog) {
-                    ctx.fillStyle = '#ffd700';
-                    ctx.font = 'bold 16px Press Start 2P';
-                    ctx.fillText('!', screenX + 12, screenY - 10 + floatOffset);
-                }
-            });
-        }
-
-        function drawMiniMap() {
-            miniMapCtx.fillStyle = '#1a1a2e';
-            miniMapCtx.fillRect(0, 0, 150, 150);
-
-            const scale = 150 / (MAP_WIDTH * TILE_SIZE);
-
-            // Draw simplified map
-            for (let y = 0; y < MAP_HEIGHT; y++) {
-                for (let x = 0; x < MAP_WIDTH; x++) {
-                    const tile = map[y][x];
-                    let color = '#2d5a27';
-                    if (tile === TILES.WATER) color = '#1e90ff';
-                    else if (tile === TILES.PATH) color = '#c9a66b';
-                    else if (tile === TILES.BUILDING_WALL || tile === TILES.BUILDING_DOOR) color = '#8b4513';
-                    else if (tile === TILES.TREE) color = '#1a4d1a';
-
-                    miniMapCtx.fillStyle = color;
-                    miniMapCtx.fillRect(x * scale * TILE_SIZE, y * scale * TILE_SIZE,
-                                       TILE_SIZE * scale + 1, TILE_SIZE * scale + 1);
-                }
-            }
-
-            // Draw location markers
-            Object.entries(LOCATIONS).forEach(([key, loc]) => {
-                miniMapCtx.fillStyle = loc.color;
-                miniMapCtx.beginPath();
-                miniMapCtx.arc(loc.x * TILE_SIZE * scale, loc.y * TILE_SIZE * scale, 4, 0, Math.PI * 2);
-                miniMapCtx.fill();
-            });
-
-            // Draw player position
-            miniMapCtx.fillStyle = '#ff0000';
-            miniMapCtx.beginPath();
-            miniMapCtx.arc(player.x * scale, player.y * scale, 3, 0, Math.PI * 2);
-            miniMapCtx.fill();
-
-            // Draw camera view rectangle
-            miniMapCtx.strokeStyle = '#fff';
-            miniMapCtx.lineWidth = 1;
-            miniMapCtx.strokeRect(
-                camera.x * scale,
-                camera.y * scale,
-                canvas.width * scale,
-                canvas.height * scale
-            );
+            ctx.font = 'bold 28px Inter';
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.fillText('KIRILL KUZNETSOV', 450, 75);
         }
 
         function render() {
-            // Clear canvas
-            ctx.fillStyle = '#1a1a2e';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Draw map
-            const startX = Math.floor(camera.x / TILE_SIZE);
-            const startY = Math.floor(camera.y / TILE_SIZE);
-            const endX = Math.ceil((camera.x + canvas.width) / TILE_SIZE);
-            const endY = Math.ceil((camera.y + canvas.height) / TILE_SIZE);
-
-            for (let y = startY; y <= endY; y++) {
-                for (let x = startX; x <= endX; x++) {
-                    if (y >= 0 && y < MAP_HEIGHT && x >= 0 && x < MAP_WIDTH) {
-                        drawTile(x, y, map[y][x]);
-                    }
-                }
-            }
-
-            // Draw NPCs
-            drawNPCs();
-
-            // Draw player
+            drawBackground();
+            drawZones();
+            drawFlowers();
+            drawTrees();
+            drawSigns();
+            drawSkillBars();
+            drawStars();
+            drawChest();
             drawPlayer();
-
-            // Draw mini map
-            drawMiniMap();
-        }
-
-        // ============== GAME LOGIC ==============
-        function updateCamera() {
-            const targetX = player.x - canvas.width / 2 + player.width / 2;
-            const targetY = player.y - canvas.height / 2 + player.height / 2;
-
-            camera.x += (targetX - camera.x) * 0.1;
-            camera.y += (targetY - camera.y) * 0.1;
-
-            // Clamp camera
-            camera.x = Math.max(0, Math.min(camera.x, MAP_WIDTH * TILE_SIZE - canvas.width));
-            camera.y = Math.max(0, Math.min(camera.y, MAP_HEIGHT * TILE_SIZE - canvas.height));
+            drawTitle();
         }
 
         function updatePlayer() {
-            if (currentDialog) return;
+            if (showingSecret) return;
 
             let dx = 0, dy = 0;
-            player.moving = false;
+            if (keys.up) dy = -player.speed;
+            if (keys.down) dy = player.speed;
+            if (keys.left) dx = -player.speed;
+            if (keys.right) dx = player.speed;
 
-            if (keys.up) { dy = -PLAYER_SPEED; player.direction = 'up'; player.moving = true; }
-            if (keys.down) { dy = PLAYER_SPEED; player.direction = 'down'; player.moving = true; }
-            if (keys.left) { dx = -PLAYER_SPEED; player.direction = 'left'; player.moving = true; }
-            if (keys.right) { dx = PLAYER_SPEED; player.direction = 'right'; player.moving = true; }
-
-            // Normalize diagonal movement
+            // Normalize diagonal
             if (dx !== 0 && dy !== 0) {
                 dx *= 0.707;
                 dy *= 0.707;
             }
 
-            // Check collision for X
             const newX = player.x + dx;
-            if (isWalkable(newX, player.y) &&
-                isWalkable(newX + player.width, player.y) &&
-                isWalkable(newX, player.y + player.height) &&
-                isWalkable(newX + player.width, player.y + player.height)) {
-                player.x = newX;
-            }
-
-            // Check collision for Y
             const newY = player.y + dy;
-            if (isWalkable(player.x, newY) &&
-                isWalkable(player.x + player.width, newY) &&
-                isWalkable(player.x, newY + player.height) &&
-                isWalkable(player.x + player.width, newY + player.height)) {
-                player.y = newY;
-            }
 
-            // Keep player in bounds
-            player.x = Math.max(0, Math.min(player.x, MAP_WIDTH * TILE_SIZE - player.width));
-            player.y = Math.max(0, Math.min(player.y, MAP_HEIGHT * TILE_SIZE - player.height));
+            // Bounds
+            if (newX > 20 && newX < canvas.width - 20) player.x = newX;
+            if (newY > 140 && newY < canvas.height - 30) player.y = newY;
         }
 
-        function updateLocationLabel() {
-            const playerTileX = Math.floor((player.x + player.width/2) / TILE_SIZE);
-            const playerTileY = Math.floor((player.y + player.height/2) / TILE_SIZE);
+        function checkCollectibles() {
+            stars.forEach(star => {
+                if (star.collected) return;
+                const dist = Math.sqrt(Math.pow(player.x - star.x, 2) + Math.pow(player.y - star.y, 2));
+                if (dist < 25) {
+                    star.collected = true;
+                    collectedStars++;
+                    document.getElementById('collectibles').textContent = `Stars: ${collectedStars}/5`;
 
-            let currentLocation = 'WILDERNESS';
-            let minDist = Infinity;
-
-            Object.entries(LOCATIONS).forEach(([key, loc]) => {
-                const dist = Math.sqrt(Math.pow(playerTileX - loc.x, 2) + Math.pow(playerTileY - loc.y, 2));
-                if (dist < 6 && dist < minDist) {
-                    minDist = dist;
-                    currentLocation = loc.name;
+                    if (collectedStars === 5) {
+                        showSecret("You found all stars! Fun fact: Kirill's first program was a calculator in Pascal, written in 2015.");
+                    }
                 }
             });
-
-            document.getElementById('locationLabel').textContent = currentLocation;
         }
 
-        function checkNearbyNPCs() {
-            const playerCenterX = player.x + player.width / 2;
-            const playerCenterY = player.y + player.height / 2;
-
-            nearbyNPC = null;
-
-            for (const npc of NPCS) {
-                const npcCenterX = npc.x * TILE_SIZE + TILE_SIZE / 2;
-                const npcCenterY = npc.y * TILE_SIZE + TILE_SIZE / 2;
-                const dist = Math.sqrt(Math.pow(playerCenterX - npcCenterX, 2) +
-                                       Math.pow(playerCenterY - npcCenterY, 2));
-
-                if (dist < TILE_SIZE * 2) {
-                    nearbyNPC = npc;
-                    break;
-                }
-            }
-
-            const hint = document.getElementById('interactionHint');
-            if (nearbyNPC && !currentDialog) {
-                hint.classList.add('active');
-            } else {
-                hint.classList.remove('active');
+        function openChest() {
+            const dist = Math.sqrt(Math.pow(player.x - chest.x - 20, 2) + Math.pow(player.y - chest.y - 15, 2));
+            if (dist < 60 && !chest.opened) {
+                chest.opened = true;
+                showSecret("Bonus info: Besides coding, Kirill enjoys solving algorithmic puzzles and exploring new ML techniques!");
             }
         }
 
-        function startDialog(npc) {
-            currentDialog = npc;
-            dialogIndex = 0;
-            showDialogText();
-            document.getElementById('dialogBox').classList.add('active');
-            document.getElementById('dialogSpeaker').textContent = npc.name;
+        function showSecret(text) {
+            showingSecret = true;
+            document.getElementById('secretText').textContent = text;
+            document.getElementById('secretPopup').classList.add('show');
         }
 
-        function showDialogText() {
-            const text = currentDialog.dialogs[dialogIndex];
-            typingText = text;
-            typingIndex = 0;
-            document.getElementById('dialogText').textContent = '';
-
-            if (typingInterval) clearInterval(typingInterval);
-
-            typingInterval = setInterval(() => {
-                if (typingIndex < typingText.length) {
-                    document.getElementById('dialogText').textContent += typingText[typingIndex];
-                    typingIndex++;
-                } else {
-                    clearInterval(typingInterval);
-                }
-            }, 30);
-        }
-
-        function advanceDialog() {
-            // If still typing, show full text
-            if (typingIndex < typingText.length) {
-                clearInterval(typingInterval);
-                document.getElementById('dialogText').textContent = typingText;
-                typingIndex = typingText.length;
-                return;
-            }
-
-            dialogIndex++;
-            if (dialogIndex >= currentDialog.dialogs.length) {
-                closeDialog();
-            } else {
-                showDialogText();
-            }
-        }
-
-        function closeDialog() {
-            currentDialog = null;
-            dialogIndex = 0;
-            document.getElementById('dialogBox').classList.remove('active');
-            if (typingInterval) clearInterval(typingInterval);
+        function hideSecret() {
+            showingSecret = false;
+            document.getElementById('secretPopup').classList.remove('show');
         }
 
         function gameLoop() {
-            if (!gameStarted) return;
-
             updatePlayer();
-            updateCamera();
-            updateLocationLabel();
-            checkNearbyNPCs();
+            checkCollectibles();
             render();
-
             requestAnimationFrame(gameLoop);
         }
 
-        // ============== INPUT HANDLING ==============
+        // Input
         document.addEventListener('keydown', (e) => {
-            if (!gameStarted) return;
+            if (showingSecret) {
+                hideSecret();
+                return;
+            }
 
             switch(e.key.toLowerCase()) {
-                case 'w':
-                case 'arrowup':
-                    keys.up = true;
-                    break;
-                case 's':
-                case 'arrowdown':
-                    keys.down = true;
-                    break;
-                case 'a':
-                case 'arrowleft':
-                    keys.left = true;
-                    break;
-                case 'd':
-                case 'arrowright':
-                    keys.right = true;
-                    break;
-                case ' ':
-                case 'e':
-                    e.preventDefault();
-                    if (currentDialog) {
-                        advanceDialog();
-                    } else if (nearbyNPC) {
-                        startDialog(nearbyNPC);
-                    }
-                    break;
-                case 'escape':
-                    if (currentDialog) {
-                        closeDialog();
-                    }
-                    break;
+                case 'w': case 'arrowup': keys.up = true; break;
+                case 's': case 'arrowdown': keys.down = true; break;
+                case 'a': case 'arrowleft': keys.left = true; break;
+                case 'd': case 'arrowright': keys.right = true; break;
+                case ' ': openChest(); break;
             }
         });
 
         document.addEventListener('keyup', (e) => {
             switch(e.key.toLowerCase()) {
-                case 'w':
-                case 'arrowup':
-                    keys.up = false;
-                    break;
-                case 's':
-                case 'arrowdown':
-                    keys.down = false;
-                    break;
-                case 'a':
-                case 'arrowleft':
-                    keys.left = false;
-                    break;
-                case 'd':
-                case 'arrowright':
-                    keys.right = false;
-                    break;
+                case 'w': case 'arrowup': keys.up = false; break;
+                case 's': case 'arrowdown': keys.down = false; break;
+                case 'a': case 'arrowleft': keys.left = false; break;
+                case 'd': case 'arrowright': keys.right = false; break;
             }
         });
 
-        // ============== LOADING SCREEN ==============
-        function simulateLoading() {
-            const loadingFill = document.getElementById('loadingFill');
-            const loadingText = document.getElementById('loadingText');
-            const startButton = document.getElementById('startButton');
-
-            const steps = [
-                { progress: 20, text: 'Generating world...' },
-                { progress: 40, text: 'Placing trees and flowers...' },
-                { progress: 60, text: 'Building structures...' },
-                { progress: 80, text: 'Summoning NPCs...' },
-                { progress: 100, text: 'Ready to explore!' }
-            ];
-
-            let stepIndex = 0;
-
-            const loadingInterval = setInterval(() => {
-                if (stepIndex < steps.length) {
-                    loadingFill.style.width = steps[stepIndex].progress + '%';
-                    loadingText.textContent = steps[stepIndex].text;
-                    stepIndex++;
-                } else {
-                    clearInterval(loadingInterval);
-                    startButton.classList.add('visible');
-                }
-            }, 500);
-        }
-
-        function startGame() {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            gameStarted = true;
-            gameLoop();
-        }
-
-        // ============== INITIALIZATION ==============
-        document.getElementById('startButton').addEventListener('click', startGame);
-
-        generateMap();
-        simulateLoading();
-
-        // Initial camera position
-        camera.x = player.x - canvas.width / 2;
-        camera.y = player.y - canvas.height / 2;
+        // Start
+        gameLoop();
     </script>
 </body>
 </html>
