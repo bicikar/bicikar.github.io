@@ -3,18 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kirill Kuznetsov — Quest Timeline</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Kirill Kuznetsov — CV Quest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #6c5ce7;
-            --secondary: #00cec9;
-            --accent: #fdcb6e;
-            --dark: #2d3436;
-            --light: #dfe6e9;
-            --bg-gradient: linear-gradient(135deg, #0c0c1e 0%, #1a1a3e 50%, #2d2d5a 100%);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -22,906 +13,1127 @@
         }
 
         body {
-            font-family: 'Nunito', sans-serif;
-            background: var(--bg-gradient);
-            color: var(--light);
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        /* Stars Background */
-        .stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 2s infinite ease-in-out;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-
-        /* Progress Bar */
-        .quest-progress {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 60px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
+            background: #1a1a2e;
             display: flex;
+            justify-content: center;
             align-items: center;
-            padding: 0 30px;
-            border-bottom: 2px solid var(--primary);
-        }
-
-        .progress-container {
-            flex: 1;
-            margin: 0 20px;
-        }
-
-        .progress-label {
+            min-height: 100vh;
             font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            color: var(--accent);
-            margin-bottom: 5px;
-        }
-
-        .progress-bar {
-            height: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
             overflow: hidden;
-            border: 2px solid var(--primary);
         }
 
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transition: width 0.3s ease;
+        .game-container {
             position: relative;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            width: 20px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5));
-            animation: shimmer 1s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { opacity: 0; }
-            50% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        .level-badge {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 12px;
-            color: var(--accent);
-            background: rgba(253, 203, 110, 0.2);
-            padding: 8px 15px;
-            border-radius: 20px;
-            border: 2px solid var(--accent);
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 100px 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-title {
-            font-family: 'Press Start 2P', cursive;
-            font-size: clamp(24px, 5vw, 48px);
-            color: var(--accent);
-            text-shadow: 0 0 30px rgba(253, 203, 110, 0.5);
-            margin-bottom: 20px;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from { text-shadow: 0 0 20px rgba(253, 203, 110, 0.5); }
-            to { text-shadow: 0 0 40px rgba(253, 203, 110, 0.8), 0 0 60px rgba(253, 203, 110, 0.4); }
-        }
-
-        .hero-subtitle {
-            font-size: 1.5rem;
-            color: var(--secondary);
-            margin-bottom: 40px;
-        }
-
-        .hero-avatar {
-            width: 150px;
-            height: 150px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-            margin-bottom: 30px;
-            border: 4px solid var(--accent);
-            box-shadow: 0 0 40px rgba(108, 92, 231, 0.5);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        .scroll-hint {
-            position: absolute;
-            bottom: 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            animation: bounce 2s infinite;
         }
 
-        .scroll-hint span {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            color: var(--accent);
+        .game-header {
+            color: #ffd700;
+            font-size: 14px;
             margin-bottom: 10px;
+            text-shadow: 2px 2px #000;
         }
 
-        .scroll-arrow {
-            width: 30px;
-            height: 30px;
-            border-right: 3px solid var(--accent);
-            border-bottom: 3px solid var(--accent);
-            transform: rotate(45deg);
+        #gameCanvas {
+            border: 4px solid #ffd700;
+            border-radius: 8px;
+            image-rendering: pixelated;
+            cursor: pointer;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(15px); }
-        }
-
-        /* Timeline Section */
-        .timeline-section {
-            padding: 100px 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .section-title {
-            font-family: 'Press Start 2P', cursive;
-            font-size: clamp(16px, 3vw, 24px);
-            color: var(--accent);
+        .controls-hint {
+            color: #888;
+            font-size: 8px;
+            margin-top: 15px;
             text-align: center;
-            margin-bottom: 60px;
         }
 
-        .timeline {
-            max-width: 1000px;
-            margin: 0 auto;
-            position: relative;
+        .controls-hint span {
+            color: #ffd700;
         }
 
-        .timeline::before {
-            content: '';
+        /* Dialog Box */
+        .dialog-box {
             position: absolute;
+            bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(180deg, var(--primary), var(--secondary), var(--accent));
-            border-radius: 2px;
+            width: 90%;
+            max-width: 700px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 4px solid #ffd700;
+            border-radius: 8px;
+            padding: 20px;
+            display: none;
+            z-index: 100;
         }
 
-        .timeline-item {
-            display: flex;
-            margin-bottom: 80px;
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 0.6s ease;
+        .dialog-box.active {
+            display: block;
+            animation: dialogAppear 0.2s ease;
         }
 
-        .timeline-item.visible {
-            opacity: 1;
-            transform: translateY(0);
+        @keyframes dialogAppear {
+            from { transform: translateX(-50%) scale(0.9); opacity: 0; }
+            to { transform: translateX(-50%) scale(1); opacity: 1; }
         }
 
-        .timeline-item:nth-child(odd) {
-            flex-direction: row-reverse;
-        }
-
-        .timeline-content {
-            width: 45%;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            border: 2px solid var(--primary);
-            position: relative;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .timeline-content:hover {
-            transform: scale(1.02);
-            border-color: var(--accent);
-            box-shadow: 0 0 30px rgba(253, 203, 110, 0.3);
-        }
-
-        .timeline-marker {
-            width: 10%;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding-top: 30px;
-        }
-
-        .marker-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--dark);
-            border: 4px solid var(--accent);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            z-index: 10;
-            box-shadow: 0 0 20px rgba(253, 203, 110, 0.5);
-        }
-
-        .timeline-year {
-            font-family: 'Press Start 2P', cursive;
+        .dialog-speaker {
+            color: #ffd700;
             font-size: 12px;
-            color: var(--accent);
             margin-bottom: 10px;
         }
 
-        .timeline-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--secondary);
-            margin-bottom: 10px;
+        .dialog-text {
+            color: #fff;
+            font-size: 10px;
+            line-height: 1.8;
+            min-height: 60px;
         }
 
-        .timeline-location {
-            font-size: 0.9rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .timeline-description {
-            color: var(--light);
-            line-height: 1.6;
-        }
-
-        .quest-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
+        .dialog-continue {
+            color: #888;
+            font-size: 8px;
             margin-top: 15px;
+            animation: blink 1s infinite;
         }
 
-        /* Skills Section */
-        .skills-section {
-            padding: 100px 20px;
-            position: relative;
-            z-index: 1;
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
         }
 
-        .skills-grid {
-            max-width: 800px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-
-        .skill-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 30px;
-            border: 2px solid var(--primary);
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.5s ease;
-        }
-
-        .skill-card.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .skill-card:hover {
-            border-color: var(--secondary);
-            box-shadow: 0 0 30px rgba(0, 206, 201, 0.3);
-        }
-
-        .skill-name {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 12px;
-            color: var(--accent);
-            margin-bottom: 15px;
-        }
-
-        .skill-bar {
-            height: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .skill-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            border-radius: 10px;
-            width: 0%;
-            transition: width 1s ease;
-        }
-
-        .skill-level {
-            font-size: 0.9rem;
-            color: var(--light);
-            text-align: right;
-        }
-
-        /* Projects Section */
-        .projects-section {
-            padding: 100px 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .projects-grid {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .project-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 30px;
-            border: 2px solid var(--primary);
-            position: relative;
-            overflow: hidden;
-            opacity: 0;
-            transform: scale(0.9);
-            transition: all 0.5s ease;
-        }
-
-        .project-card.visible {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .project-card::before {
-            content: '';
+        /* Mini Map */
+        .mini-map {
             position: absolute;
+            top: 60px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ffd700;
+            border-radius: 4px;
+        }
+
+        /* Location Label */
+        .location-label {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ffd700;
+            border-radius: 4px;
+            padding: 10px 15px;
+            color: #ffd700;
+            font-size: 10px;
+        }
+
+        /* Interaction Hint */
+        .interaction-hint {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff88;
+            border-radius: 4px;
+            padding: 8px 15px;
+            color: #00ff88;
+            font-size: 8px;
+            display: none;
+            animation: pulse 1s infinite;
+        }
+
+        .interaction-hint.active {
+            display: block;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.05); }
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-        }
-
-        .project-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .project-icon {
-            font-size: 40px;
-            margin-bottom: 20px;
-        }
-
-        .project-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--secondary);
-            margin-bottom: 10px;
-        }
-
-        .project-date {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            color: var(--accent);
-            margin-bottom: 15px;
-        }
-
-        .project-description {
-            color: var(--light);
-            line-height: 1.6;
-        }
-
-        .project-tags {
+            height: 100%;
+            background: #1a1a2e;
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-title {
+            color: #ffd700;
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px #000;
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 20px;
+            background: #333;
+            border: 3px solid #ffd700;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .loading-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff6b6b, #ffd700, #00ff88);
+            transition: width 0.3s;
+        }
+
+        .loading-text {
+            color: #888;
+            font-size: 10px;
             margin-top: 20px;
         }
 
-        .project-tag {
-            background: rgba(108, 92, 231, 0.3);
-            color: var(--light);
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-        }
-
-        /* Contact Section */
-        .contact-section {
-            padding: 100px 20px;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .contact-links {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-            margin-top: 40px;
-        }
-
-        .contact-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 15px 30px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid var(--primary);
-            border-radius: 30px;
-            color: var(--light);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .contact-link:hover {
-            background: var(--primary);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(108, 92, 231, 0.4);
-        }
-
-        .contact-link span {
-            font-size: 24px;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 40px 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .footer-text {
+        .start-button {
+            margin-top: 30px;
+            padding: 15px 40px;
+            background: #ffd700;
+            border: none;
+            border-radius: 4px;
+            color: #1a1a2e;
             font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            color: var(--accent);
-        }
-
-        /* Achievement Popup */
-        .achievement {
-            position: fixed;
-            top: 80px;
-            right: -400px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 3px solid var(--accent);
-            border-radius: 15px;
-            padding: 20px 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            z-index: 1001;
-            transition: right 0.5s ease;
-        }
-
-        .achievement.show {
-            right: 20px;
-        }
-
-        .achievement-icon {
-            font-size: 40px;
-        }
-
-        .achievement-text {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            color: var(--accent);
-        }
-
-        .achievement-name {
             font-size: 12px;
-            color: var(--light);
-            margin-top: 5px;
+            cursor: pointer;
+            display: none;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .timeline::before {
-                left: 20px;
-            }
+        .start-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
 
-            .timeline-item {
-                flex-direction: column !important;
-            }
+        .start-button.visible {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
 
-            .timeline-content {
-                width: 100%;
-                margin-left: 50px;
-            }
-
-            .timeline-marker {
-                position: absolute;
-                left: 0;
-            }
-
-            .quest-progress {
-                padding: 0 15px;
-            }
-
-            .level-badge {
-                display: none;
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <!-- Stars Background -->
-    <div class="stars" id="stars"></div>
-
-    <!-- Quest Progress Bar -->
-    <div class="quest-progress">
-        <div class="level-badge">LVL 5</div>
-        <div class="progress-container">
-            <div class="progress-label">JOURNEY PROGRESS</div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="loading-title">CV QUEST</h1>
+        <div class="loading-bar">
+            <div class="loading-fill" id="loadingFill"></div>
         </div>
+        <p class="loading-text" id="loadingText">Loading world...</p>
+        <button class="start-button" id="startButton">START GAME</button>
     </div>
 
-    <!-- Achievement Popup -->
-    <div class="achievement" id="achievement">
-        <div class="achievement-icon">🏆</div>
-        <div>
-            <div class="achievement-text">ACHIEVEMENT UNLOCKED</div>
-            <div class="achievement-name" id="achievementName"></div>
+    <div class="game-container">
+        <h1 class="game-header">KIRILL KUZNETSOV — CV QUEST</h1>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <div class="location-label" id="locationLabel">🏠 SPAWN POINT</div>
+
+        <canvas class="mini-map" id="miniMap" width="150" height="150"></canvas>
+
+        <div class="interaction-hint" id="interactionHint">Press SPACE or E to interact</div>
+
+        <div class="dialog-box" id="dialogBox">
+            <div class="dialog-speaker" id="dialogSpeaker">???</div>
+            <div class="dialog-text" id="dialogText"></div>
+            <div class="dialog-continue">Press SPACE to continue...</div>
         </div>
+
+        <p class="controls-hint">
+            <span>WASD</span> or <span>ARROWS</span> to move |
+            <span>SPACE</span> or <span>E</span> to interact |
+            <span>ESC</span> to close dialog
+        </p>
     </div>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-avatar">🧙‍♂️</div>
-        <h1 class="hero-title">KIRILL KUZNETSOV</h1>
-        <p class="hero-subtitle">Data Engineer & Algorithm Explorer</p>
-        <p style="color: var(--light); max-width: 600px; line-height: 1.8;">
-            Welcome, traveler! Scroll down to explore my journey through the realms of
-            Data Science, Machine Learning, and Software Engineering.
-        </p>
-        <div class="scroll-hint">
-            <span>START QUEST</span>
-            <div class="scroll-arrow"></div>
-        </div>
-    </section>
-
-    <!-- Education Timeline -->
-    <section class="timeline-section">
-        <h2 class="section-title">📚 EDUCATION QUEST LOG</h2>
-        <div class="timeline">
-            <div class="timeline-item" data-achievement="Scholar">
-                <div class="timeline-content">
-                    <div class="timeline-year">2019 — 2023</div>
-                    <h3 class="timeline-title">Bachelor's Degree</h3>
-                    <div class="timeline-location">📍 Saint-Petersburg State University</div>
-                    <p class="timeline-description">
-                        Mathematics and Computer Sciences department. Specialized in
-                        "Mathematics, Algorithms and Data Analysis". Mastered the arcane
-                        arts of algorithmic thinking.
-                    </p>
-                    <span class="quest-badge">✓ QUEST COMPLETE</span>
-                </div>
-                <div class="timeline-marker">
-                    <div class="marker-icon">🎓</div>
-                </div>
-                <div style="width: 45%"></div>
-            </div>
-
-            <div class="timeline-item" data-achievement="Data Apprentice">
-                <div class="timeline-content">
-                    <div class="timeline-year">2021 — 2022</div>
-                    <h3 class="timeline-title">Data Science Program</h3>
-                    <div class="timeline-location">📍 Computer Science Center</div>
-                    <p class="timeline-description">
-                        Intensive training in the ways of Data Science. Acquired powerful
-                        skills in Python, machine learning, and data analysis.
-                    </p>
-                    <span class="quest-badge">✓ QUEST COMPLETE</span>
-                </div>
-                <div class="timeline-marker">
-                    <div class="marker-icon">📊</div>
-                </div>
-                <div style="width: 45%"></div>
-            </div>
-
-            <div class="timeline-item" data-achievement="Big Data Master">
-                <div class="timeline-content">
-                    <div class="timeline-year">2022 — 2024</div>
-                    <h3 class="timeline-title">Big Data Infrastructure</h3>
-                    <div class="timeline-location">📍 Yandex School of Data Analysis</div>
-                    <p class="timeline-description">
-                        Advanced training at the legendary YSDA guild. Learned to wield
-                        massive datasets and build scalable infrastructure.
-                    </p>
-                    <span class="quest-badge">✓ QUEST COMPLETE</span>
-                </div>
-                <div class="timeline-marker">
-                    <div class="marker-icon">🔮</div>
-                </div>
-                <div style="width: 45%"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Skills Section -->
-    <section class="skills-section">
-        <h2 class="section-title">⚔️ SKILL TREE</h2>
-        <div class="skills-grid">
-            <div class="skill-card" data-skill="90">
-                <div class="skill-name">PYTHON</div>
-                <div class="skill-bar">
-                    <div class="skill-fill"></div>
-                </div>
-                <div class="skill-level">Level 90 / 100</div>
-            </div>
-
-            <div class="skill-card" data-skill="80">
-                <div class="skill-name">C / C++</div>
-                <div class="skill-bar">
-                    <div class="skill-fill"></div>
-                </div>
-                <div class="skill-level">Level 80 / 100</div>
-            </div>
-
-            <div class="skill-card" data-skill="75">
-                <div class="skill-name">POSTGRESQL</div>
-                <div class="skill-bar">
-                    <div class="skill-fill"></div>
-                </div>
-                <div class="skill-level">Level 75 / 100</div>
-            </div>
-
-            <div class="skill-card" data-skill="85">
-                <div class="skill-name">MACHINE LEARNING</div>
-                <div class="skill-bar">
-                    <div class="skill-fill"></div>
-                </div>
-                <div class="skill-level">Level 85 / 100</div>
-            </div>
-
-            <div class="skill-card" data-skill="80">
-                <div class="skill-name">DATA ANALYSIS</div>
-                <div class="skill-bar">
-                    <div class="skill-fill"></div>
-                </div>
-                <div class="skill-level">Level 80 / 100</div>
-            </div>
-
-            <div class="skill-card" data-skill="70">
-                <div class="skill-name">ALGORITHMS</div>
-                <div class="skill-bar">
-                    <div class="skill-fill"></div>
-                </div>
-                <div class="skill-level">Level 70 / 100</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Projects Section -->
-    <section class="projects-section">
-        <h2 class="section-title">🗡️ COMPLETED QUESTS</h2>
-        <div class="projects-grid">
-            <div class="project-card">
-                <div class="project-icon">🤖</div>
-                <h3 class="project-title">Protocol Detection Bot</h3>
-                <div class="project-date">SPRING 2022</div>
-                <p class="project-description">
-                    Built an OCR system for table recognition and handwritten digit
-                    classification. Conquered the realm of computer vision.
-                </p>
-                <div class="project-tags">
-                    <span class="project-tag">Python</span>
-                    <span class="project-tag">OCR</span>
-                    <span class="project-tag">ML</span>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-icon">🧭</div>
-                <h3 class="project-title">Bounded Suboptimal Algorithms</h3>
-                <div class="project-date">AUTUMN 2022</div>
-                <p class="project-description">
-                    Implemented the EES algorithm with various priority functions.
-                    Explored the depths of search optimization.
-                </p>
-                <div class="project-tags">
-                    <span class="project-tag">C++</span>
-                    <span class="project-tag">Algorithms</span>
-                    <span class="project-tag">AI</span>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-icon">🗺️</div>
-                <h3 class="project-title">RRT* Path Planning</h3>
-                <div class="project-date">AUTUMN 2021</div>
-                <p class="project-description">
-                    Created a path planning algorithm with real-time visualization.
-                    Charted courses through complex terrains.
-                </p>
-                <div class="project-tags">
-                    <span class="project-tag">Python</span>
-                    <span class="project-tag">Robotics</span>
-                    <span class="project-tag">Visualization</span>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-icon">📜</div>
-                <h3 class="project-title">Academic Research</h3>
-                <div class="project-date">2018 — 2019</div>
-                <p class="project-description">
-                    Published research on subquandles of free quandles. Ancient
-                    mathematical knowledge preserved on arXiv.
-                </p>
-                <div class="project-tags">
-                    <span class="project-tag">Mathematics</span>
-                    <span class="project-tag">Research</span>
-                    <span class="project-tag">Published</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="contact-section">
-        <h2 class="section-title">📬 SEND A RAVEN</h2>
-        <p style="color: var(--light); max-width: 500px; margin: 0 auto;">
-            Ready to embark on a new quest together? Let's connect!
-        </p>
-        <div class="contact-links">
-            <a href="mailto:kirill.kz20010@gmail.com" class="contact-link">
-                <span>📧</span> Email
-            </a>
-            <a href="https://github.com/bicikar" target="_blank" class="contact-link">
-                <span>💻</span> GitHub
-            </a>
-            <a href="tel:+79315923423" class="contact-link">
-                <span>📱</span> Phone
-            </a>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <p class="footer-text">© 2024 KIRILL KUZNETSOV • QUEST CONTINUES...</p>
-    </footer>
 
     <script>
-        // Generate stars
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            for (let i = 0; i < 200; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.width = Math.random() * 3 + 1 + 'px';
-                star.style.height = star.style.width;
-                star.style.animationDelay = Math.random() * 2 + 's';
-                starsContainer.appendChild(star);
-            }
-        }
-        createStars();
+        // ============== GAME CONFIG ==============
+        const TILE_SIZE = 32;
+        const MAP_WIDTH = 40;
+        const MAP_HEIGHT = 30;
+        const PLAYER_SPEED = 3;
 
-        // Progress bar
-        function updateProgress() {
-            const scrollTop = window.scrollY;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const progress = (scrollTop / docHeight) * 100;
-            document.getElementById('progressFill').style.width = progress + '%';
-        }
-        window.addEventListener('scroll', updateProgress);
-
-        // Intersection Observer for animations
-        const observerOptions = {
-            threshold: 0.2,
-            rootMargin: '0px 0px -50px 0px'
+        // Tile types
+        const TILES = {
+            GRASS: 0,
+            WATER: 1,
+            PATH: 2,
+            TREE: 3,
+            BUILDING_WALL: 4,
+            BUILDING_DOOR: 5,
+            FLOWER: 6,
+            ROCK: 7,
+            BRIDGE: 8,
+            SAND: 9
         };
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
+        // Colors for tiles
+        const TILE_COLORS = {
+            [TILES.GRASS]: '#2d5a27',
+            [TILES.WATER]: '#1e90ff',
+            [TILES.PATH]: '#c9a66b',
+            [TILES.TREE]: '#1a4d1a',
+            [TILES.BUILDING_WALL]: '#8b4513',
+            [TILES.BUILDING_DOOR]: '#daa520',
+            [TILES.FLOWER]: '#2d5a27',
+            [TILES.ROCK]: '#696969',
+            [TILES.BRIDGE]: '#8b7355',
+            [TILES.SAND]: '#f4d03f'
+        };
 
-                    // Animate skill bars
-                    if (entry.target.classList.contains('skill-card')) {
-                        const skillLevel = entry.target.dataset.skill;
-                        const skillFill = entry.target.querySelector('.skill-fill');
-                        setTimeout(() => {
-                            skillFill.style.width = skillLevel + '%';
-                        }, 200);
-                    }
+        // Locations on the map
+        const LOCATIONS = {
+            SPAWN: { x: 20, y: 15, name: '🏠 HOME', color: '#ffd700' },
+            UNIVERSITY: { x: 8, y: 6, name: '🎓 UNIVERSITY', color: '#ff6b6b' },
+            CSC: { x: 32, y: 6, name: '📊 CS CENTER', color: '#4ecdc4' },
+            YSDA: { x: 8, y: 24, name: '🔮 YSDA', color: '#a855f7' },
+            PROJECTS: { x: 32, y: 24, name: '🗡️ PROJECTS LAB', color: '#f97316' },
+            SKILLS: { x: 20, y: 6, name: '⚔️ SKILL FORGE', color: '#06b6d4' },
+            CONTACT: { x: 20, y: 24, name: '📬 POST OFFICE', color: '#ec4899' }
+        };
 
-                    // Show achievement
-                    if (entry.target.dataset.achievement) {
-                        showAchievement(entry.target.dataset.achievement);
-                    }
+        // NPCs and interactive objects
+        const NPCS = [
+            {
+                id: 'professor',
+                x: 8, y: 8,
+                sprite: '👨‍🏫',
+                name: 'Professor',
+                location: 'UNIVERSITY',
+                dialogs: [
+                    "Welcome to Saint-Petersburg State University!",
+                    "Kirill studied here from 2019 to 2023.",
+                    "He earned a Bachelor's degree in Mathematics and Computer Sciences.",
+                    "Specialized in 'Mathematics, Algorithms and Data Analysis'.",
+                    "A brilliant student with a passion for algorithmic thinking!"
+                ]
+            },
+            {
+                id: 'data_scientist',
+                x: 32, y: 8,
+                sprite: '👩‍💻',
+                name: 'Data Scientist',
+                location: 'CSC',
+                dialogs: [
+                    "This is the Computer Science Center!",
+                    "Kirill completed the Data Science program here in 2021-2022.",
+                    "He mastered Python, machine learning, and data analysis.",
+                    "The training was intense but incredibly valuable!",
+                    "Many top tech specialists come from this program."
+                ]
+            },
+            {
+                id: 'yandex_mentor',
+                x: 8, y: 22,
+                sprite: '🧙‍♂️',
+                name: 'YSDA Mentor',
+                location: 'YSDA',
+                dialogs: [
+                    "Welcome to Yandex School of Data Analysis!",
+                    "Kirill studied Big Data Infrastructure here from 2022 to 2024.",
+                    "YSDA is one of the most prestigious data science schools.",
+                    "Here he learned to build scalable data pipelines.",
+                    "Working with massive datasets became his specialty!"
+                ]
+            },
+            {
+                id: 'blacksmith',
+                x: 20, y: 8,
+                sprite: '⚒️',
+                name: 'Skill Master',
+                location: 'SKILLS',
+                dialogs: [
+                    "Welcome to the Skill Forge!",
+                    "Let me tell you about Kirill's abilities...",
+                    "🐍 PYTHON — Level 90/100 — His primary weapon!",
+                    "⚔️ C/C++ — Level 80/100 — For performance-critical tasks.",
+                    "🗃️ PostgreSQL — Level 75/100 — Database mastery.",
+                    "🤖 Machine Learning — Level 85/100 — AI sorcery!",
+                    "📊 Data Analysis — Level 80/100 — Finding insights in data.",
+                    "🌐 Languages: Russian (native), English (intermediate)"
+                ]
+            },
+            {
+                id: 'quest_giver',
+                x: 32, y: 22,
+                sprite: '📜',
+                name: 'Quest Master',
+                location: 'PROJECTS',
+                dialogs: [
+                    "Ah, you want to hear about completed quests?",
+                    "🤖 PROTOCOL DETECTION BOT (Spring 2022)",
+                    "   Built an OCR system for table recognition!",
+                    "   Conquered handwritten digit classification.",
+                    "🧭 BOUNDED SUBOPTIMAL ALGORITHMS (Autumn 2022)",
+                    "   Implemented the EES algorithm with priority functions.",
+                    "   Explored the depths of search optimization!",
+                    "🗺️ RRT* PATH PLANNING (Autumn 2021)",
+                    "   Created path planning with real-time visualization.",
+                    "📜 ACADEMIC RESEARCH (2018-2019)",
+                    "   Published on arXiv: research on subquandles!",
+                    "   arxiv.org/abs/1904.06571"
+                ]
+            },
+            {
+                id: 'postman',
+                x: 20, y: 22,
+                sprite: '📮',
+                name: 'Messenger',
+                location: 'CONTACT',
+                dialogs: [
+                    "Need to send a raven to Kirill?",
+                    "📧 Email: kirill.kz20010@gmail.com",
+                    "💻 GitHub: github.com/bicikar",
+                    "📱 Phone: +7 (931) 592-3423",
+                    "📍 Location: Saint-Petersburg, Russia",
+                    "Feel free to reach out for collaboration!"
+                ]
+            },
+            {
+                id: 'home_sign',
+                x: 20, y: 13,
+                sprite: '🏠',
+                name: 'Welcome Sign',
+                location: 'SPAWN',
+                dialogs: [
+                    "Welcome to Kirill's CV Quest!",
+                    "Explore the map to learn about Kirill Kuznetsov.",
+                    "Visit different locations to discover:",
+                    "🎓 Education history",
+                    "⚔️ Technical skills",
+                    "🗡️ Completed projects",
+                    "📬 Contact information",
+                    "Use WASD or Arrow keys to move around!",
+                    "Good luck on your adventure!"
+                ]
+            }
+        ];
+
+        // ============== GAME STATE ==============
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const miniMapCanvas = document.getElementById('miniMap');
+        const miniMapCtx = miniMapCanvas.getContext('2d');
+
+        let gameStarted = false;
+        let map = [];
+        let camera = { x: 0, y: 0 };
+        let currentDialog = null;
+        let dialogIndex = 0;
+        let nearbyNPC = null;
+        let typingText = '';
+        let typingIndex = 0;
+        let typingInterval = null;
+
+        const player = {
+            x: LOCATIONS.SPAWN.x * TILE_SIZE,
+            y: LOCATIONS.SPAWN.y * TILE_SIZE,
+            width: 28,
+            height: 28,
+            direction: 'down',
+            frame: 0,
+            moving: false
+        };
+
+        const keys = {
+            up: false,
+            down: false,
+            left: false,
+            right: false
+        };
+
+        // ============== MAP GENERATION ==============
+        function generateMap() {
+            // Initialize with grass
+            for (let y = 0; y < MAP_HEIGHT; y++) {
+                map[y] = [];
+                for (let x = 0; x < MAP_WIDTH; x++) {
+                    map[y][x] = TILES.GRASS;
+                }
+            }
+
+            // Add water borders
+            for (let x = 0; x < MAP_WIDTH; x++) {
+                map[0][x] = TILES.WATER;
+                map[1][x] = TILES.WATER;
+                map[MAP_HEIGHT-1][x] = TILES.WATER;
+                map[MAP_HEIGHT-2][x] = TILES.WATER;
+            }
+            for (let y = 0; y < MAP_HEIGHT; y++) {
+                map[y][0] = TILES.WATER;
+                map[y][1] = TILES.WATER;
+                map[y][MAP_WIDTH-1] = TILES.WATER;
+                map[y][MAP_WIDTH-2] = TILES.WATER;
+            }
+
+            // Add paths connecting locations
+            // Horizontal main path
+            for (let x = 3; x < MAP_WIDTH - 3; x++) {
+                map[15][x] = TILES.PATH;
+                map[14][x] = TILES.PATH;
+            }
+            // Vertical paths
+            for (let y = 3; y < MAP_HEIGHT - 3; y++) {
+                map[y][20] = TILES.PATH;
+                map[y][8] = TILES.PATH;
+                map[y][32] = TILES.PATH;
+            }
+            // Horizontal connections
+            for (let x = 3; x < MAP_WIDTH - 3; x++) {
+                map[6][x] = TILES.PATH;
+                map[24][x] = TILES.PATH;
+            }
+
+            // Add trees around the map
+            const treePositions = [];
+            for (let i = 0; i < 80; i++) {
+                const x = Math.floor(Math.random() * (MAP_WIDTH - 6)) + 3;
+                const y = Math.floor(Math.random() * (MAP_HEIGHT - 6)) + 3;
+                if (map[y][x] === TILES.GRASS && !isNearLocation(x, y) && !isNearPath(x, y)) {
+                    map[y][x] = TILES.TREE;
+                    treePositions.push({x, y});
+                }
+            }
+
+            // Add flowers
+            for (let i = 0; i < 40; i++) {
+                const x = Math.floor(Math.random() * (MAP_WIDTH - 6)) + 3;
+                const y = Math.floor(Math.random() * (MAP_HEIGHT - 6)) + 3;
+                if (map[y][x] === TILES.GRASS && !isNearLocation(x, y)) {
+                    map[y][x] = TILES.FLOWER;
+                }
+            }
+
+            // Add rocks
+            for (let i = 0; i < 20; i++) {
+                const x = Math.floor(Math.random() * (MAP_WIDTH - 6)) + 3;
+                const y = Math.floor(Math.random() * (MAP_HEIGHT - 6)) + 3;
+                if (map[y][x] === TILES.GRASS && !isNearLocation(x, y)) {
+                    map[y][x] = TILES.ROCK;
+                }
+            }
+
+            // Add buildings at locations
+            Object.entries(LOCATIONS).forEach(([key, loc]) => {
+                if (key !== 'SPAWN') {
+                    addBuilding(loc.x - 2, loc.y - 2, 5, 4);
                 }
             });
-        }, observerOptions);
-
-        // Observe elements
-        document.querySelectorAll('.timeline-item, .skill-card, .project-card').forEach(el => {
-            observer.observe(el);
-        });
-
-        // Achievement system
-        const shownAchievements = new Set();
-        function showAchievement(name) {
-            if (shownAchievements.has(name)) return;
-            shownAchievements.add(name);
-
-            const achievement = document.getElementById('achievement');
-            document.getElementById('achievementName').textContent = name;
-            achievement.classList.add('show');
-
-            setTimeout(() => {
-                achievement.classList.remove('show');
-            }, 3000);
         }
 
-        // Parallax effect for hero
-        window.addEventListener('scroll', () => {
-            const scrolled = window.scrollY;
-            const hero = document.querySelector('.hero');
-            hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+        function addBuilding(startX, startY, width, height) {
+            for (let y = startY; y < startY + height; y++) {
+                for (let x = startX; x < startX + width; x++) {
+                    if (y >= 0 && y < MAP_HEIGHT && x >= 0 && x < MAP_WIDTH) {
+                        map[y][x] = TILES.BUILDING_WALL;
+                    }
+                }
+            }
+            // Add door
+            const doorX = startX + Math.floor(width / 2);
+            const doorY = startY + height - 1;
+            if (doorY < MAP_HEIGHT) {
+                map[doorY][doorX] = TILES.BUILDING_DOOR;
+            }
+        }
+
+        function isNearLocation(x, y) {
+            return Object.values(LOCATIONS).some(loc =>
+                Math.abs(x - loc.x) < 4 && Math.abs(y - loc.y) < 4
+            );
+        }
+
+        function isNearPath(x, y) {
+            for (let dy = -1; dy <= 1; dy++) {
+                for (let dx = -1; dx <= 1; dx++) {
+                    const ny = y + dy;
+                    const nx = x + dx;
+                    if (ny >= 0 && ny < MAP_HEIGHT && nx >= 0 && nx < MAP_WIDTH) {
+                        if (map[ny][nx] === TILES.PATH) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function isWalkable(x, y) {
+            const tileX = Math.floor(x / TILE_SIZE);
+            const tileY = Math.floor(y / TILE_SIZE);
+
+            if (tileX < 0 || tileX >= MAP_WIDTH || tileY < 0 || tileY >= MAP_HEIGHT) {
+                return false;
+            }
+
+            const tile = map[tileY][tileX];
+            return tile !== TILES.WATER &&
+                   tile !== TILES.TREE &&
+                   tile !== TILES.BUILDING_WALL &&
+                   tile !== TILES.ROCK;
+        }
+
+        // ============== RENDERING ==============
+        function drawTile(x, y, tile) {
+            const screenX = x * TILE_SIZE - camera.x;
+            const screenY = y * TILE_SIZE - camera.y;
+
+            // Skip if off screen
+            if (screenX < -TILE_SIZE || screenX > canvas.width ||
+                screenY < -TILE_SIZE || screenY > canvas.height) {
+                return;
+            }
+
+            ctx.fillStyle = TILE_COLORS[tile];
+            ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+
+            // Add details
+            switch(tile) {
+                case TILES.GRASS:
+                    // Random grass blades
+                    ctx.fillStyle = '#3d7a37';
+                    if ((x + y) % 3 === 0) {
+                        ctx.fillRect(screenX + 5, screenY + 10, 2, 8);
+                        ctx.fillRect(screenX + 20, screenY + 15, 2, 6);
+                    }
+                    break;
+
+                case TILES.WATER:
+                    // Water waves
+                    ctx.fillStyle = '#4aa8ff';
+                    const waveOffset = Math.sin(Date.now() / 500 + x + y) * 3;
+                    ctx.fillRect(screenX + 5, screenY + 10 + waveOffset, 10, 3);
+                    ctx.fillRect(screenX + 18, screenY + 20 + waveOffset, 8, 3);
+                    break;
+
+                case TILES.PATH:
+                    // Path texture
+                    ctx.fillStyle = '#b8956b';
+                    ctx.fillRect(screenX + 3, screenY + 3, 4, 4);
+                    ctx.fillRect(screenX + 15, screenY + 12, 5, 5);
+                    ctx.fillRect(screenX + 25, screenY + 5, 3, 3);
+                    break;
+
+                case TILES.TREE:
+                    // Tree trunk
+                    ctx.fillStyle = '#5d4037';
+                    ctx.fillRect(screenX + 12, screenY + 18, 8, 14);
+                    // Tree top
+                    ctx.fillStyle = '#2e7d32';
+                    ctx.beginPath();
+                    ctx.arc(screenX + 16, screenY + 12, 14, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#388e3c';
+                    ctx.beginPath();
+                    ctx.arc(screenX + 12, screenY + 8, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+
+                case TILES.BUILDING_WALL:
+                    // Brick pattern
+                    ctx.fillStyle = '#a0522d';
+                    ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+                    ctx.strokeStyle = '#6b3a1f';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(screenX + 2, screenY + 2, 12, 8);
+                    ctx.strokeRect(screenX + 16, screenY + 2, 12, 8);
+                    ctx.strokeRect(screenX + 8, screenY + 12, 12, 8);
+                    ctx.strokeRect(screenX + 2, screenY + 22, 12, 8);
+                    ctx.strokeRect(screenX + 22, screenY + 22, 8, 8);
+                    // Roof hint at top
+                    if (y > 0 && map[y-1] && map[y-1][x] !== TILES.BUILDING_WALL) {
+                        ctx.fillStyle = '#8b0000';
+                        ctx.fillRect(screenX - 2, screenY - 4, TILE_SIZE + 4, 6);
+                    }
+                    break;
+
+                case TILES.BUILDING_DOOR:
+                    // Door
+                    ctx.fillStyle = '#a0522d';
+                    ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+                    ctx.fillStyle = '#daa520';
+                    ctx.fillRect(screenX + 8, screenY + 4, 16, 28);
+                    ctx.fillStyle = '#b8860b';
+                    ctx.fillRect(screenX + 10, screenY + 6, 12, 24);
+                    // Door knob
+                    ctx.fillStyle = '#ffd700';
+                    ctx.beginPath();
+                    ctx.arc(screenX + 18, screenY + 18, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+
+                case TILES.FLOWER:
+                    // Base grass
+                    ctx.fillStyle = '#2d5a27';
+                    ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+                    // Flowers
+                    const colors = ['#ff6b6b', '#ffd700', '#ff69b4', '#fff'];
+                    ctx.fillStyle = colors[(x + y) % colors.length];
+                    ctx.beginPath();
+                    ctx.arc(screenX + 10, screenY + 12, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = colors[(x + y + 1) % colors.length];
+                    ctx.beginPath();
+                    ctx.arc(screenX + 22, screenY + 20, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+
+                case TILES.ROCK:
+                    // Rock
+                    ctx.fillStyle = '#2d5a27';
+                    ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+                    ctx.fillStyle = '#808080';
+                    ctx.beginPath();
+                    ctx.ellipse(screenX + 16, screenY + 20, 12, 8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#a0a0a0';
+                    ctx.beginPath();
+                    ctx.ellipse(screenX + 14, screenY + 18, 8, 5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+            }
+        }
+
+        function drawPlayer() {
+            const screenX = player.x - camera.x;
+            const screenY = player.y - camera.y;
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(screenX + 14, screenY + 30, 12, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Body
+            ctx.fillStyle = '#4a90d9';
+            ctx.fillRect(screenX + 6, screenY + 14, 16, 14);
+
+            // Head
+            ctx.fillStyle = '#ffdbac';
+            ctx.fillRect(screenX + 8, screenY + 4, 12, 12);
+
+            // Hair
+            ctx.fillStyle = '#4a3728';
+            ctx.fillRect(screenX + 7, screenY + 2, 14, 6);
+
+            // Eyes
+            ctx.fillStyle = '#000';
+            if (player.direction === 'up') {
+                // Looking up - no eyes visible
+            } else {
+                ctx.fillRect(screenX + 10, screenY + 8, 2, 2);
+                ctx.fillRect(screenX + 16, screenY + 8, 2, 2);
+            }
+
+            // Direction indicator (cape/back detail)
+            ctx.fillStyle = '#ffd700';
+            switch(player.direction) {
+                case 'down':
+                    ctx.fillRect(screenX + 10, screenY + 14, 8, 2);
+                    break;
+                case 'up':
+                    ctx.fillRect(screenX + 6, screenY + 16, 4, 10);
+                    ctx.fillRect(screenX + 18, screenY + 16, 4, 10);
+                    break;
+                case 'left':
+                    ctx.fillRect(screenX + 18, screenY + 14, 4, 12);
+                    break;
+                case 'right':
+                    ctx.fillRect(screenX + 6, screenY + 14, 4, 12);
+                    break;
+            }
+
+            // Legs with walking animation
+            ctx.fillStyle = '#2c3e50';
+            const legOffset = player.moving ? Math.sin(Date.now() / 100) * 3 : 0;
+            ctx.fillRect(screenX + 8, screenY + 26 + legOffset, 4, 6);
+            ctx.fillRect(screenX + 16, screenY + 26 - legOffset, 4, 6);
+        }
+
+        function drawNPCs() {
+            NPCS.forEach(npc => {
+                const screenX = npc.x * TILE_SIZE - camera.x;
+                const screenY = npc.y * TILE_SIZE - camera.y;
+
+                if (screenX < -TILE_SIZE || screenX > canvas.width ||
+                    screenY < -TILE_SIZE || screenY > canvas.height) {
+                    return;
+                }
+
+                // NPC sprite (emoji)
+                ctx.font = '28px Arial';
+                ctx.fillText(npc.sprite, screenX + 2, screenY + 28);
+
+                // Floating animation
+                const floatOffset = Math.sin(Date.now() / 500 + npc.x) * 2;
+
+                // Exclamation mark if nearby
+                if (nearbyNPC && nearbyNPC.id === npc.id && !currentDialog) {
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = 'bold 16px Press Start 2P';
+                    ctx.fillText('!', screenX + 12, screenY - 10 + floatOffset);
+                }
+            });
+        }
+
+        function drawMiniMap() {
+            miniMapCtx.fillStyle = '#1a1a2e';
+            miniMapCtx.fillRect(0, 0, 150, 150);
+
+            const scale = 150 / (MAP_WIDTH * TILE_SIZE);
+
+            // Draw simplified map
+            for (let y = 0; y < MAP_HEIGHT; y++) {
+                for (let x = 0; x < MAP_WIDTH; x++) {
+                    const tile = map[y][x];
+                    let color = '#2d5a27';
+                    if (tile === TILES.WATER) color = '#1e90ff';
+                    else if (tile === TILES.PATH) color = '#c9a66b';
+                    else if (tile === TILES.BUILDING_WALL || tile === TILES.BUILDING_DOOR) color = '#8b4513';
+                    else if (tile === TILES.TREE) color = '#1a4d1a';
+
+                    miniMapCtx.fillStyle = color;
+                    miniMapCtx.fillRect(x * scale * TILE_SIZE, y * scale * TILE_SIZE,
+                                       TILE_SIZE * scale + 1, TILE_SIZE * scale + 1);
+                }
+            }
+
+            // Draw location markers
+            Object.entries(LOCATIONS).forEach(([key, loc]) => {
+                miniMapCtx.fillStyle = loc.color;
+                miniMapCtx.beginPath();
+                miniMapCtx.arc(loc.x * TILE_SIZE * scale, loc.y * TILE_SIZE * scale, 4, 0, Math.PI * 2);
+                miniMapCtx.fill();
+            });
+
+            // Draw player position
+            miniMapCtx.fillStyle = '#ff0000';
+            miniMapCtx.beginPath();
+            miniMapCtx.arc(player.x * scale, player.y * scale, 3, 0, Math.PI * 2);
+            miniMapCtx.fill();
+
+            // Draw camera view rectangle
+            miniMapCtx.strokeStyle = '#fff';
+            miniMapCtx.lineWidth = 1;
+            miniMapCtx.strokeRect(
+                camera.x * scale,
+                camera.y * scale,
+                canvas.width * scale,
+                canvas.height * scale
+            );
+        }
+
+        function render() {
+            // Clear canvas
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw map
+            const startX = Math.floor(camera.x / TILE_SIZE);
+            const startY = Math.floor(camera.y / TILE_SIZE);
+            const endX = Math.ceil((camera.x + canvas.width) / TILE_SIZE);
+            const endY = Math.ceil((camera.y + canvas.height) / TILE_SIZE);
+
+            for (let y = startY; y <= endY; y++) {
+                for (let x = startX; x <= endX; x++) {
+                    if (y >= 0 && y < MAP_HEIGHT && x >= 0 && x < MAP_WIDTH) {
+                        drawTile(x, y, map[y][x]);
+                    }
+                }
+            }
+
+            // Draw NPCs
+            drawNPCs();
+
+            // Draw player
+            drawPlayer();
+
+            // Draw mini map
+            drawMiniMap();
+        }
+
+        // ============== GAME LOGIC ==============
+        function updateCamera() {
+            const targetX = player.x - canvas.width / 2 + player.width / 2;
+            const targetY = player.y - canvas.height / 2 + player.height / 2;
+
+            camera.x += (targetX - camera.x) * 0.1;
+            camera.y += (targetY - camera.y) * 0.1;
+
+            // Clamp camera
+            camera.x = Math.max(0, Math.min(camera.x, MAP_WIDTH * TILE_SIZE - canvas.width));
+            camera.y = Math.max(0, Math.min(camera.y, MAP_HEIGHT * TILE_SIZE - canvas.height));
+        }
+
+        function updatePlayer() {
+            if (currentDialog) return;
+
+            let dx = 0, dy = 0;
+            player.moving = false;
+
+            if (keys.up) { dy = -PLAYER_SPEED; player.direction = 'up'; player.moving = true; }
+            if (keys.down) { dy = PLAYER_SPEED; player.direction = 'down'; player.moving = true; }
+            if (keys.left) { dx = -PLAYER_SPEED; player.direction = 'left'; player.moving = true; }
+            if (keys.right) { dx = PLAYER_SPEED; player.direction = 'right'; player.moving = true; }
+
+            // Normalize diagonal movement
+            if (dx !== 0 && dy !== 0) {
+                dx *= 0.707;
+                dy *= 0.707;
+            }
+
+            // Check collision for X
+            const newX = player.x + dx;
+            if (isWalkable(newX, player.y) &&
+                isWalkable(newX + player.width, player.y) &&
+                isWalkable(newX, player.y + player.height) &&
+                isWalkable(newX + player.width, player.y + player.height)) {
+                player.x = newX;
+            }
+
+            // Check collision for Y
+            const newY = player.y + dy;
+            if (isWalkable(player.x, newY) &&
+                isWalkable(player.x + player.width, newY) &&
+                isWalkable(player.x, newY + player.height) &&
+                isWalkable(player.x + player.width, newY + player.height)) {
+                player.y = newY;
+            }
+
+            // Keep player in bounds
+            player.x = Math.max(0, Math.min(player.x, MAP_WIDTH * TILE_SIZE - player.width));
+            player.y = Math.max(0, Math.min(player.y, MAP_HEIGHT * TILE_SIZE - player.height));
+        }
+
+        function updateLocationLabel() {
+            const playerTileX = Math.floor((player.x + player.width/2) / TILE_SIZE);
+            const playerTileY = Math.floor((player.y + player.height/2) / TILE_SIZE);
+
+            let currentLocation = 'WILDERNESS';
+            let minDist = Infinity;
+
+            Object.entries(LOCATIONS).forEach(([key, loc]) => {
+                const dist = Math.sqrt(Math.pow(playerTileX - loc.x, 2) + Math.pow(playerTileY - loc.y, 2));
+                if (dist < 6 && dist < minDist) {
+                    minDist = dist;
+                    currentLocation = loc.name;
+                }
+            });
+
+            document.getElementById('locationLabel').textContent = currentLocation;
+        }
+
+        function checkNearbyNPCs() {
+            const playerCenterX = player.x + player.width / 2;
+            const playerCenterY = player.y + player.height / 2;
+
+            nearbyNPC = null;
+
+            for (const npc of NPCS) {
+                const npcCenterX = npc.x * TILE_SIZE + TILE_SIZE / 2;
+                const npcCenterY = npc.y * TILE_SIZE + TILE_SIZE / 2;
+                const dist = Math.sqrt(Math.pow(playerCenterX - npcCenterX, 2) +
+                                       Math.pow(playerCenterY - npcCenterY, 2));
+
+                if (dist < TILE_SIZE * 2) {
+                    nearbyNPC = npc;
+                    break;
+                }
+            }
+
+            const hint = document.getElementById('interactionHint');
+            if (nearbyNPC && !currentDialog) {
+                hint.classList.add('active');
+            } else {
+                hint.classList.remove('active');
+            }
+        }
+
+        function startDialog(npc) {
+            currentDialog = npc;
+            dialogIndex = 0;
+            showDialogText();
+            document.getElementById('dialogBox').classList.add('active');
+            document.getElementById('dialogSpeaker').textContent = npc.name;
+        }
+
+        function showDialogText() {
+            const text = currentDialog.dialogs[dialogIndex];
+            typingText = text;
+            typingIndex = 0;
+            document.getElementById('dialogText').textContent = '';
+
+            if (typingInterval) clearInterval(typingInterval);
+
+            typingInterval = setInterval(() => {
+                if (typingIndex < typingText.length) {
+                    document.getElementById('dialogText').textContent += typingText[typingIndex];
+                    typingIndex++;
+                } else {
+                    clearInterval(typingInterval);
+                }
+            }, 30);
+        }
+
+        function advanceDialog() {
+            // If still typing, show full text
+            if (typingIndex < typingText.length) {
+                clearInterval(typingInterval);
+                document.getElementById('dialogText').textContent = typingText;
+                typingIndex = typingText.length;
+                return;
+            }
+
+            dialogIndex++;
+            if (dialogIndex >= currentDialog.dialogs.length) {
+                closeDialog();
+            } else {
+                showDialogText();
+            }
+        }
+
+        function closeDialog() {
+            currentDialog = null;
+            dialogIndex = 0;
+            document.getElementById('dialogBox').classList.remove('active');
+            if (typingInterval) clearInterval(typingInterval);
+        }
+
+        function gameLoop() {
+            if (!gameStarted) return;
+
+            updatePlayer();
+            updateCamera();
+            updateLocationLabel();
+            checkNearbyNPCs();
+            render();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ============== INPUT HANDLING ==============
+        document.addEventListener('keydown', (e) => {
+            if (!gameStarted) return;
+
+            switch(e.key.toLowerCase()) {
+                case 'w':
+                case 'arrowup':
+                    keys.up = true;
+                    break;
+                case 's':
+                case 'arrowdown':
+                    keys.down = true;
+                    break;
+                case 'a':
+                case 'arrowleft':
+                    keys.left = true;
+                    break;
+                case 'd':
+                case 'arrowright':
+                    keys.right = true;
+                    break;
+                case ' ':
+                case 'e':
+                    e.preventDefault();
+                    if (currentDialog) {
+                        advanceDialog();
+                    } else if (nearbyNPC) {
+                        startDialog(nearbyNPC);
+                    }
+                    break;
+                case 'escape':
+                    if (currentDialog) {
+                        closeDialog();
+                    }
+                    break;
+            }
         });
+
+        document.addEventListener('keyup', (e) => {
+            switch(e.key.toLowerCase()) {
+                case 'w':
+                case 'arrowup':
+                    keys.up = false;
+                    break;
+                case 's':
+                case 'arrowdown':
+                    keys.down = false;
+                    break;
+                case 'a':
+                case 'arrowleft':
+                    keys.left = false;
+                    break;
+                case 'd':
+                case 'arrowright':
+                    keys.right = false;
+                    break;
+            }
+        });
+
+        // ============== LOADING SCREEN ==============
+        function simulateLoading() {
+            const loadingFill = document.getElementById('loadingFill');
+            const loadingText = document.getElementById('loadingText');
+            const startButton = document.getElementById('startButton');
+
+            const steps = [
+                { progress: 20, text: 'Generating world...' },
+                { progress: 40, text: 'Placing trees and flowers...' },
+                { progress: 60, text: 'Building structures...' },
+                { progress: 80, text: 'Summoning NPCs...' },
+                { progress: 100, text: 'Ready to explore!' }
+            ];
+
+            let stepIndex = 0;
+
+            const loadingInterval = setInterval(() => {
+                if (stepIndex < steps.length) {
+                    loadingFill.style.width = steps[stepIndex].progress + '%';
+                    loadingText.textContent = steps[stepIndex].text;
+                    stepIndex++;
+                } else {
+                    clearInterval(loadingInterval);
+                    startButton.classList.add('visible');
+                }
+            }, 500);
+        }
+
+        function startGame() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            gameStarted = true;
+            gameLoop();
+        }
+
+        // ============== INITIALIZATION ==============
+        document.getElementById('startButton').addEventListener('click', startGame);
+
+        generateMap();
+        simulateLoading();
+
+        // Initial camera position
+        camera.x = player.x - canvas.width / 2;
+        camera.y = player.y - canvas.height / 2;
     </script>
 </body>
 </html>
