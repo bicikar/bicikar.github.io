@@ -1,1 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirill Kuznetsov — Quest Timeline</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #00cec9;
+            --accent: #fdcb6e;
+            --dark: #2d3436;
+            --light: #dfe6e9;
+            --bg-gradient: linear-gradient(135deg, #0c0c1e 0%, #1a1a3e 50%, #2d2d5a 100%);
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--light);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Stars Background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Progress Bar */
+        .quest-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 20px;
+        }
+
+        .progress-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 20px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5));
+            animation: shimmer 1s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .level-badge {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: var(--accent);
+            background: rgba(253, 203, 110, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 2px solid var(--accent);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(24px, 5vw, 48px);
+            color: var(--accent);
+            text-shadow: 0 0 30px rgba(253, 203, 110, 0.5);
+            margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(253, 203, 110, 0.5); }
+            to { text-shadow: 0 0 40px rgba(253, 203, 110, 0.8), 0 0 60px rgba(253, 203, 110, 0.4); }
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 40px;
+        }
+
+        .hero-avatar {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            margin-bottom: 30px;
+            border: 4px solid var(--accent);
+            box-shadow: 0 0 40px rgba(108, 92, 231, 0.5);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-hint span {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .scroll-arrow {
+            width: 30px;
+            height: 30px;
+            border-right: 3px solid var(--accent);
+            border-bottom: 3px solid var(--accent);
+            transform: rotate(45deg);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(15px); }
+        }
+
+        /* Timeline Section */
+        .timeline-section {
+            padding: 100px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(16px, 3vw, 24px);
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .timeline {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--secondary), var(--accent));
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 80px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+        }
+
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: 45%;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 2px solid var(--primary);
+            position: relative;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(253, 203, 110, 0.3);
+        }
+
+        .timeline-marker {
+            width: 10%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 30px;
+        }
+
+        .marker-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--dark);
+            border: 4px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(253, 203, 110, 0.5);
+        }
+
+        .timeline-year {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .timeline-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .timeline-location {
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timeline-description {
+            color: var(--light);
+            line-height: 1.6;
+        }
+
+        .quest-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        /* Skills Section */
+        .skills-section {
+            padding: 100px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .skills-grid {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .skill-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid var(--primary);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s ease;
+        }
+
+        .skill-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .skill-card:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 0 30px rgba(0, 206, 201, 0.3);
+        }
+
+        .skill-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .skill-bar {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .skill-level {
+            font-size: 0.9rem;
+            color: var(--light);
+            text-align: right;
+        }
+
+        /* Projects Section */
+        .projects-section {
+            padding: 100px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .projects-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.5s ease;
+        }
+
+        .project-card.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .project-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        .project-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .project-date {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .project-description {
+            color: var(--light);
+            line-height: 1.6;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .project-tag {
+            background: rgba(108, 92, 231, 0.3);
+            color: var(--light);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 100px 20px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--primary);
+            border-radius: 30px;
+            color: var(--light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .contact-link:hover {
+            background: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(108, 92, 231, 0.4);
+        }
+
+        .contact-link span {
+            font-size: 24px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: var(--accent);
+        }
+
+        /* Achievement Popup */
+        .achievement {
+            position: fixed;
+            top: 80px;
+            right: -400px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid var(--accent);
+            border-radius: 15px;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1001;
+            transition: right 0.5s ease;
+        }
+
+        .achievement.show {
+            right: 20px;
+        }
+
+        .achievement-icon {
+            font-size: 40px;
+        }
+
+        .achievement-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: var(--accent);
+        }
+
+        .achievement-name {
+            font-size: 12px;
+            color: var(--light);
+            margin-top: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                flex-direction: column !important;
+            }
+
+            .timeline-content {
+                width: 100%;
+                margin-left: 50px;
+            }
+
+            .timeline-marker {
+                position: absolute;
+                left: 0;
+            }
+
+            .quest-progress {
+                padding: 0 15px;
+            }
+
+            .level-badge {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Stars Background -->
+    <div class="stars" id="stars"></div>
+
+    <!-- Quest Progress Bar -->
+    <div class="quest-progress">
+        <div class="level-badge">LVL 5</div>
+        <div class="progress-container">
+            <div class="progress-label">JOURNEY PROGRESS</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievement Popup -->
+    <div class="achievement" id="achievement">
+        <div class="achievement-icon">🏆</div>
+        <div>
+            <div class="achievement-text">ACHIEVEMENT UNLOCKED</div>
+            <div class="achievement-name" id="achievementName"></div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-avatar">🧙‍♂️</div>
+        <h1 class="hero-title">KIRILL KUZNETSOV</h1>
+        <p class="hero-subtitle">Data Engineer & Algorithm Explorer</p>
+        <p style="color: var(--light); max-width: 600px; line-height: 1.8;">
+            Welcome, traveler! Scroll down to explore my journey through the realms of
+            Data Science, Machine Learning, and Software Engineering.
+        </p>
+        <div class="scroll-hint">
+            <span>START QUEST</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <!-- Education Timeline -->
+    <section class="timeline-section">
+        <h2 class="section-title">📚 EDUCATION QUEST LOG</h2>
+        <div class="timeline">
+            <div class="timeline-item" data-achievement="Scholar">
+                <div class="timeline-content">
+                    <div class="timeline-year">2019 — 2023</div>
+                    <h3 class="timeline-title">Bachelor's Degree</h3>
+                    <div class="timeline-location">📍 Saint-Petersburg State University</div>
+                    <p class="timeline-description">
+                        Mathematics and Computer Sciences department. Specialized in
+                        "Mathematics, Algorithms and Data Analysis". Mastered the arcane
+                        arts of algorithmic thinking.
+                    </p>
+                    <span class="quest-badge">✓ QUEST COMPLETE</span>
+                </div>
+                <div class="timeline-marker">
+                    <div class="marker-icon">🎓</div>
+                </div>
+                <div style="width: 45%"></div>
+            </div>
+
+            <div class="timeline-item" data-achievement="Data Apprentice">
+                <div class="timeline-content">
+                    <div class="timeline-year">2021 — 2022</div>
+                    <h3 class="timeline-title">Data Science Program</h3>
+                    <div class="timeline-location">📍 Computer Science Center</div>
+                    <p class="timeline-description">
+                        Intensive training in the ways of Data Science. Acquired powerful
+                        skills in Python, machine learning, and data analysis.
+                    </p>
+                    <span class="quest-badge">✓ QUEST COMPLETE</span>
+                </div>
+                <div class="timeline-marker">
+                    <div class="marker-icon">📊</div>
+                </div>
+                <div style="width: 45%"></div>
+            </div>
+
+            <div class="timeline-item" data-achievement="Big Data Master">
+                <div class="timeline-content">
+                    <div class="timeline-year">2022 — 2024</div>
+                    <h3 class="timeline-title">Big Data Infrastructure</h3>
+                    <div class="timeline-location">📍 Yandex School of Data Analysis</div>
+                    <p class="timeline-description">
+                        Advanced training at the legendary YSDA guild. Learned to wield
+                        massive datasets and build scalable infrastructure.
+                    </p>
+                    <span class="quest-badge">✓ QUEST COMPLETE</span>
+                </div>
+                <div class="timeline-marker">
+                    <div class="marker-icon">🔮</div>
+                </div>
+                <div style="width: 45%"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="skills-section">
+        <h2 class="section-title">⚔️ SKILL TREE</h2>
+        <div class="skills-grid">
+            <div class="skill-card" data-skill="90">
+                <div class="skill-name">PYTHON</div>
+                <div class="skill-bar">
+                    <div class="skill-fill"></div>
+                </div>
+                <div class="skill-level">Level 90 / 100</div>
+            </div>
+
+            <div class="skill-card" data-skill="80">
+                <div class="skill-name">C / C++</div>
+                <div class="skill-bar">
+                    <div class="skill-fill"></div>
+                </div>
+                <div class="skill-level">Level 80 / 100</div>
+            </div>
+
+            <div class="skill-card" data-skill="75">
+                <div class="skill-name">POSTGRESQL</div>
+                <div class="skill-bar">
+                    <div class="skill-fill"></div>
+                </div>
+                <div class="skill-level">Level 75 / 100</div>
+            </div>
+
+            <div class="skill-card" data-skill="85">
+                <div class="skill-name">MACHINE LEARNING</div>
+                <div class="skill-bar">
+                    <div class="skill-fill"></div>
+                </div>
+                <div class="skill-level">Level 85 / 100</div>
+            </div>
+
+            <div class="skill-card" data-skill="80">
+                <div class="skill-name">DATA ANALYSIS</div>
+                <div class="skill-bar">
+                    <div class="skill-fill"></div>
+                </div>
+                <div class="skill-level">Level 80 / 100</div>
+            </div>
+
+            <div class="skill-card" data-skill="70">
+                <div class="skill-name">ALGORITHMS</div>
+                <div class="skill-bar">
+                    <div class="skill-fill"></div>
+                </div>
+                <div class="skill-level">Level 70 / 100</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="projects-section">
+        <h2 class="section-title">🗡️ COMPLETED QUESTS</h2>
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="project-icon">🤖</div>
+                <h3 class="project-title">Protocol Detection Bot</h3>
+                <div class="project-date">SPRING 2022</div>
+                <p class="project-description">
+                    Built an OCR system for table recognition and handwritten digit
+                    classification. Conquered the realm of computer vision.
+                </p>
+                <div class="project-tags">
+                    <span class="project-tag">Python</span>
+                    <span class="project-tag">OCR</span>
+                    <span class="project-tag">ML</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-icon">🧭</div>
+                <h3 class="project-title">Bounded Suboptimal Algorithms</h3>
+                <div class="project-date">AUTUMN 2022</div>
+                <p class="project-description">
+                    Implemented the EES algorithm with various priority functions.
+                    Explored the depths of search optimization.
+                </p>
+                <div class="project-tags">
+                    <span class="project-tag">C++</span>
+                    <span class="project-tag">Algorithms</span>
+                    <span class="project-tag">AI</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-icon">🗺️</div>
+                <h3 class="project-title">RRT* Path Planning</h3>
+                <div class="project-date">AUTUMN 2021</div>
+                <p class="project-description">
+                    Created a path planning algorithm with real-time visualization.
+                    Charted courses through complex terrains.
+                </p>
+                <div class="project-tags">
+                    <span class="project-tag">Python</span>
+                    <span class="project-tag">Robotics</span>
+                    <span class="project-tag">Visualization</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-icon">📜</div>
+                <h3 class="project-title">Academic Research</h3>
+                <div class="project-date">2018 — 2019</div>
+                <p class="project-description">
+                    Published research on subquandles of free quandles. Ancient
+                    mathematical knowledge preserved on arXiv.
+                </p>
+                <div class="project-tags">
+                    <span class="project-tag">Mathematics</span>
+                    <span class="project-tag">Research</span>
+                    <span class="project-tag">Published</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <h2 class="section-title">📬 SEND A RAVEN</h2>
+        <p style="color: var(--light); max-width: 500px; margin: 0 auto;">
+            Ready to embark on a new quest together? Let's connect!
+        </p>
+        <div class="contact-links">
+            <a href="mailto:kirill.kz20010@gmail.com" class="contact-link">
+                <span>📧</span> Email
+            </a>
+            <a href="https://github.com/bicikar" target="_blank" class="contact-link">
+                <span>💻</span> GitHub
+            </a>
+            <a href="tel:+79315923423" class="contact-link">
+                <span>📱</span> Phone
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">© 2024 KIRILL KUZNETSOV • QUEST CONTINUES...</p>
+    </footer>
+
+    <script>
+        // Generate stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        createStars();
+
+        // Progress bar
+        function updateProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        window.addEventListener('scroll', updateProgress);
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+
+                    // Animate skill bars
+                    if (entry.target.classList.contains('skill-card')) {
+                        const skillLevel = entry.target.dataset.skill;
+                        const skillFill = entry.target.querySelector('.skill-fill');
+                        setTimeout(() => {
+                            skillFill.style.width = skillLevel + '%';
+                        }, 200);
+                    }
+
+                    // Show achievement
+                    if (entry.target.dataset.achievement) {
+                        showAchievement(entry.target.dataset.achievement);
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements
+        document.querySelectorAll('.timeline-item, .skill-card, .project-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Achievement system
+        const shownAchievements = new Set();
+        function showAchievement(name) {
+            if (shownAchievements.has(name)) return;
+            shownAchievements.add(name);
+
+            const achievement = document.getElementById('achievement');
+            document.getElementById('achievementName').textContent = name;
+            achievement.classList.add('show');
+
+            setTimeout(() => {
+                achievement.classList.remove('show');
+            }, 3000);
+        }
+
+        // Parallax effect for hero
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY;
+            const hero = document.querySelector('.hero');
+            hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+        });
+    </script>
+</body>
+</html>
