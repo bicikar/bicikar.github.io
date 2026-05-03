@@ -1,582 +1,1085 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kirill Kuznetsov — CV World</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Кирилл Кузнецов — CV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background: #0f0f23;
+            background: #2a2118;
+            overflow: hidden;
+            font-family: 'Spectral', serif;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-        }
-
-        .game-wrapper {
-            position: relative;
-        }
-
-        .game-title {
-            font-family: 'Press Start 2P', cursive;
-            color: #ffd700;
-            font-size: 16px;
-            text-align: center;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px #000;
         }
 
         #gameCanvas {
-            border: 4px solid #ffd700;
-            border-radius: 8px;
-            display: block;
+            border-radius: 4px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.9);
         }
 
-        .controls {
-            font-family: 'Press Start 2P', cursive;
-            color: #666;
-            font-size: 8px;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .controls span {
-            color: #ffd700;
-        }
-
-        /* Collectible counter */
-        .collectibles {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(0,0,0,0.8);
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 2px solid #ffd700;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            color: #ffd700;
-        }
-
-        /* Secret found popup */
-        .secret-popup {
+        /* Burnt edges overlay */
+        .burnt-edges {
             position: fixed;
-            top: 50%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            box-shadow: inset 0 0 150px rgba(30, 20, 10, 0.8);
+            z-index: 10;
+        }
+
+        .ui-element {
+            position: fixed;
+            z-index: 20;
+            font-family: 'Spectral', serif;
+        }
+
+        .location-title {
+            top: 25px;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: rgba(0,0,0,0.95);
-            padding: 30px 50px;
-            border-radius: 15px;
-            border: 3px solid #ffd700;
+            transform: translateX(-50%);
+            color: #3d2914;
+            font-family: 'Pirata One', cursive;
+            font-size: 22px;
+            letter-spacing: 3px;
+            text-shadow: 1px 1px 0 rgba(255,250,240,0.5);
+            background: linear-gradient(to bottom, #e8d5b0, #d4c4a0);
+            padding: 8px 25px;
+            border-radius: 3px;
+            border: 2px solid #8b7355;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+
+        .controls-hint {
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #5a4a3a;
+            font-size: 13px;
+            letter-spacing: 1px;
+            background: rgba(232, 213, 176, 0.9);
+            padding: 5px 15px;
+            border-radius: 3px;
+            border: 1px solid #8b7355;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(20,15,10,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .popup-content {
+            background: linear-gradient(145deg, #e8d5b0, #d4c4a0);
+            border: 3px solid #6b5344;
+            border-radius: 8px;
+            padding: 35px 45px;
+            max-width: 480px;
             text-align: center;
-            z-index: 1000;
-            transition: transform 0.3s ease;
+            transform: scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
         }
 
-        .secret-popup.show {
-            transform: translate(-50%, -50%) scale(1);
+        .popup-overlay.active .popup-content {
+            transform: scale(1);
         }
 
-        .secret-popup h2 {
-            font-family: 'Press Start 2P', cursive;
-            color: #ffd700;
-            font-size: 14px;
+        .popup-content h2 {
+            font-family: 'Pirata One', cursive;
+            color: #3d2914;
+            font-size: 24px;
+            letter-spacing: 2px;
             margin-bottom: 15px;
         }
 
-        .secret-popup p {
-            color: #fff;
-            font-size: 14px;
-            line-height: 1.6;
+        .popup-content p {
+            color: #4a3a2a;
+            font-size: 15px;
+            line-height: 1.7;
         }
 
-        .secret-popup .close-hint {
-            color: #666;
-            font-size: 10px;
+        .popup-hint {
+            color: #7a6a5a;
+            font-size: 11px;
             margin-top: 20px;
-            font-family: 'Press Start 2P', cursive;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
-    <div class="game-wrapper">
-        <h1 class="game-title">KIRILL KUZNETSOV</h1>
-        <canvas id="gameCanvas" width="900" height="650"></canvas>
-        <p class="controls"><span>WASD</span> or <span>ARROWS</span> to explore</p>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div class="burnt-edges"></div>
 
-        <div class="collectibles" id="collectibles">Stars: 0/5</div>
+        <div class="ui-element location-title" id="locationTitle">Карта</div>
+        <div class="ui-element controls-hint">WASD или стрелки — передвижение</div>
+    </div>
 
-        <div class="secret-popup" id="secretPopup">
-            <h2>SECRET FOUND!</h2>
-            <p id="secretText"></p>
-            <p class="close-hint">Press any key</p>
+    <div class="popup-overlay" id="popup">
+        <div class="popup-content">
+            <h2 id="popupTitle">СЕКРЕТ</h2>
+            <p id="popupText"></p>
+            <p class="popup-hint">нажмите любую клавишу</p>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
 
-        // Game state
-        const player = { x: 450, y: 520, size: 20, speed: 4 };
-        const keys = { up: false, down: false, left: false, right: false };
-        let collectedStars = 0;
-        let showingSecret = false;
+    function resizeCanvas() {
+        const ratio = 16/10;
+        let w = window.innerWidth * 0.96;
+        let h = window.innerHeight * 0.92;
+        if (w/h > ratio) w = h * ratio;
+        else h = w / ratio;
+        canvas.width = Math.floor(w);
+        canvas.height = Math.floor(h);
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-        // Color palette
-        const colors = {
-            grass: '#1a472a',
-            grassLight: '#2d5a3d',
-            path: '#c9a66b',
-            pathDark: '#a8885a',
-            water: '#1e5799',
-            waterLight: '#3a7bd5',
-            building: '#4a3728',
-            roof: '#8b0000',
-            wood: '#654321',
-            gold: '#ffd700',
-            text: '#ffffff',
-            textDark: '#333333'
-        };
+    // World - larger map for exploration
+    const WORLD = { width: 2800, height: 2200 };
+    const camera = { x: 0, y: 0 };
+    const player = { x: 1400, y: 1100, speed: 4 };
+    const keys = { up: false, down: false, left: false, right: false };
+    let time = 0;
+    let showingPopup = false;
 
-        // Signs with CV information (positioned on map)
-        const signs = [
-            // Title area
-            { x: 450, y: 80, text: 'DATA ENGINEER', size: 24, color: '#ffd700', font: 'Press Start 2P' },
-            { x: 450, y: 110, text: 'Saint-Petersburg, Russia', size: 14, color: '#aaa' },
+    // Parchment colors
+    const colors = {
+        parchment: '#e8d5b0',
+        parchmentDark: '#d4c4a0',
+        parchmentLight: '#f5ecd8',
+        ink: '#3d2914',
+        inkLight: '#5a4a3a',
+        inkFaded: '#8b7a6a',
+        gold: '#c9a227',
+        red: '#8b3a3a',
+        blue: '#3a5a7b',
+        green: '#4a6a4a',
+    };
 
-            // Education zone (left side)
-            { x: 120, y: 180, text: 'EDUCATION', size: 16, color: '#ff6b6b', font: 'Press Start 2P' },
+    // Tree structure from center
+    // Center: Name
+    // Top: Education (SPbGU, CSC, ShAD)
+    // Right: Experience (Yandex, Gazprom)
+    // Left: Projects
+    // Bottom: Contacts
+    // Around center: Skills
 
-            { x: 120, y: 230, text: 'SPbU', size: 14, color: '#ffd700', font: 'Press Start 2P' },
-            { x: 120, y: 255, text: "Bachelor's Degree", size: 12, color: '#fff' },
-            { x: 120, y: 275, text: 'Mathematics & CS', size: 11, color: '#ccc' },
-            { x: 120, y: 295, text: '2019 — 2023', size: 10, color: '#888' },
+    const locations = [
+        // CENTER - Main
+        {
+            id: 'center',
+            name: 'Кирилл Кузнецов',
+            x: 1400, y: 1100,
+            radius: 180,
+            type: 'center',
+            content: [
+                { text: 'Кирилл Кузнецов', size: 36, y: -60, font: 'Pirata One', color: colors.ink },
+                { text: '✦ Инженер данных ✦', size: 16, y: -15, color: colors.inkLight },
+                { text: 'Санкт-Петербург', size: 14, y: 15, color: colors.inkFaded, italic: true },
+                { text: 'Исследуй карту, чтобы узнать больше', size: 12, y: 55, color: colors.inkFaded, italic: true },
+            ]
+        },
 
-            { x: 120, y: 350, text: 'CS CENTER', size: 14, color: '#ffd700', font: 'Press Start 2P' },
-            { x: 120, y: 375, text: 'Data Science Program', size: 12, color: '#fff' },
-            { x: 120, y: 395, text: '2021 — 2022', size: 10, color: '#888' },
+        // TOP - Education zone
+        {
+            id: 'spbu',
+            name: 'СПбГУ',
+            x: 1150, y: 400,
+            radius: 140,
+            type: 'education',
+            content: [
+                { text: 'СПбГУ', size: 26, y: -95, font: 'Pirata One', color: colors.ink },
+                { text: 'Факультет математики', size: 13, y: -60, color: colors.inkLight },
+                { text: 'и компьютерных наук', size: 13, y: -42, color: colors.inkLight },
+                { text: '2019 — 2023', size: 12, y: -18, color: colors.inkFaded, italic: true },
+                { text: '─────', size: 12, y: 0, color: colors.inkFaded },
+                { text: 'Бакалавриат', size: 14, y: 25, color: colors.ink },
+                { text: 'Математика, алгоритмы,', size: 11, y: 50, color: colors.inkLight },
+                { text: 'анализ данных, ML', size: 11, y: 68, color: colors.inkLight },
+            ]
+        },
+        {
+            id: 'csc',
+            name: 'CS Center',
+            x: 1400, y: 350,
+            radius: 120,
+            type: 'education',
+            content: [
+                { text: 'CS Center', size: 24, y: -75, font: 'Pirata One', color: colors.ink },
+                { text: 'Computer Science Center', size: 11, y: -45, color: colors.inkLight },
+                { text: '2021 — 2022', size: 12, y: -22, color: colors.inkFaded, italic: true },
+                { text: '─────', size: 12, y: -2, color: colors.inkFaded },
+                { text: 'Data Science', size: 14, y: 22, color: colors.ink },
+                { text: 'Python, ML, базы данных', size: 11, y: 45, color: colors.inkLight },
+            ]
+        },
+        {
+            id: 'shad',
+            name: 'ШАД Яндекс',
+            x: 1650, y: 400,
+            radius: 140,
+            type: 'education',
+            content: [
+                { text: 'ШАД Яндекс', size: 24, y: -95, font: 'Pirata One', color: colors.ink },
+                { text: 'Школа Анализа Данных', size: 12, y: -62, color: colors.inkLight },
+                { text: '2022 — 2024', size: 12, y: -40, color: colors.inkFaded, italic: true },
+                { text: '─────', size: 12, y: -18, color: colors.inkFaded },
+                { text: 'Инфраструктура', size: 14, y: 8, color: colors.ink },
+                { text: 'Больших Данных', size: 14, y: 28, color: colors.ink },
+                { text: 'C++, Golang, системы', size: 11, y: 55, color: colors.inkLight },
+            ]
+        },
 
-            { x: 120, y: 450, text: 'YSDA', size: 14, color: '#ffd700', font: 'Press Start 2P' },
-            { x: 120, y: 475, text: 'Big Data Infrastructure', size: 12, color: '#fff' },
-            { x: 120, y: 495, text: 'Yandex School', size: 11, color: '#ccc' },
-            { x: 120, y: 515, text: '2022 — 2024', size: 10, color: '#888' },
+        // RIGHT - Experience zone
+        {
+            id: 'yandex',
+            name: 'Яндекс',
+            x: 2100, y: 900,
+            radius: 150,
+            type: 'experience',
+            content: [
+                { text: 'Яндекс', size: 28, y: -110, font: 'Pirata One', color: colors.red },
+                { text: 'Big Data Engineer', size: 14, y: -75, color: colors.ink },
+                { text: '(стажёр)', size: 12, y: -55, color: colors.inkLight },
+                { text: 'Апрель — Июль 2023', size: 11, y: -32, color: colors.inkFaded, italic: true },
+                { text: '─────', size: 12, y: -12, color: colors.inkFaded },
+                { text: 'Архитектура DWH для', size: 12, y: 12, color: colors.inkLight },
+                { text: 'оптимального потока данных', size: 11, y: 30, color: colors.inkLight },
+                { text: 'Асинхронный код для API', size: 12, y: 52, color: colors.inkLight },
+                { text: 'Python • YQL • DWH', size: 11, y: 78, color: colors.blue },
+            ]
+        },
+        {
+            id: 'gazprom',
+            name: 'Газпром Нефть',
+            x: 2150, y: 1350,
+            radius: 160,
+            type: 'experience',
+            content: [
+                { text: 'Газпром Нефть', size: 26, y: -120, font: 'Pirata One', color: colors.blue },
+                { text: 'Инженер-исследователь', size: 14, y: -82, color: colors.ink },
+                { text: 'Июль 2023 — настоящее время', size: 11, y: -58, color: colors.inkFaded, italic: true },
+                { text: '─────', size: 12, y: -38, color: colors.inkFaded },
+                { text: 'Формулировка задач для', size: 12, y: -12, color: colors.inkLight },
+                { text: 'тензорных сетей и QUBO-', size: 12, y: 6, color: colors.inkLight },
+                { text: 'решателей под требования', size: 11, y: 24, color: colors.inkLight },
+                { text: 'приложений', size: 11, y: 42, color: colors.inkLight },
+                { text: 'Трансляция мат. моделей', size: 12, y: 66, color: colors.inkLight },
+                { text: 'в алгоритмический код', size: 11, y: 84, color: colors.inkLight },
+                { text: 'Python • Qiskit', size: 11, y: 108, color: colors.blue },
+            ]
+        },
 
-            // Skills zone (center)
-            { x: 450, y: 180, text: 'SKILLS', size: 16, color: '#4ecdc4', font: 'Press Start 2P' },
+        // LEFT - Projects zone
+        {
+            id: 'projects',
+            name: 'Проекты',
+            x: 650, y: 1100,
+            radius: 170,
+            type: 'projects',
+            content: [
+                { text: 'Проекты', size: 28, y: -130, font: 'Pirata One', color: colors.green },
+                { text: '◆ Protocol Detection Bot ◆', size: 13, y: -92, color: colors.ink },
+                { text: 'Telegram-бот с OCR', size: 12, y: -70, color: colors.inkLight },
+                { text: 'Распознавание таблиц,', size: 11, y: -50, color: colors.inkLight },
+                { text: 'извлечение текста,', size: 11, y: -32, color: colors.inkLight },
+                { text: 'рукописные цифры', size: 11, y: -14, color: colors.inkLight },
+                { text: '◆ Heuristic Search ◆', size: 13, y: 18, color: colors.ink },
+                { text: 'Алгоритм EES для', size: 12, y: 40, color: colors.inkLight },
+                { text: 'навигации роботов', size: 11, y: 58, color: colors.inkLight },
+                { text: '◆ RRT* Path Planning ◆', size: 13, y: 88, color: colors.ink },
+                { text: 'Алгоритм планирования', size: 11, y: 108, color: colors.inkLight },
+            ]
+        },
 
-            { x: 350, y: 240, text: 'Python', size: 13, color: '#fff' },
-            { x: 350, y: 290, text: 'C / C++', size: 13, color: '#fff' },
-            { x: 350, y: 340, text: 'PostgreSQL', size: 13, color: '#fff' },
+        // BOTTOM - Contacts
+        {
+            id: 'contacts',
+            name: 'Контакты',
+            x: 1400, y: 1800,
+            radius: 140,
+            type: 'contacts',
+            content: [
+                { text: 'Контакты', size: 26, y: -90, font: 'Pirata One', color: colors.ink },
+                { text: '─────', size: 12, y: -55, color: colors.inkFaded },
+                { text: '✉ kirill.kz20010@gmail.com', size: 13, y: -25, color: colors.inkLight },
+                { text: '⚓ github.com/bicikar', size: 13, y: 5, color: colors.inkLight },
+                { text: '☎ +7 (931) 592-3423', size: 13, y: 35, color: colors.inkLight },
+                { text: '─────', size: 12, y: 60, color: colors.inkFaded },
+                { text: 'Санкт-Петербург, Россия', size: 12, y: 85, color: colors.inkFaded, italic: true },
+            ]
+        },
 
-            { x: 550, y: 240, text: 'Machine Learning', size: 13, color: '#fff' },
-            { x: 550, y: 290, text: 'Data Analysis', size: 13, color: '#fff' },
-            { x: 550, y: 340, text: 'Algorithms', size: 13, color: '#fff' },
+        // SKILLS - around center
+        {
+            id: 'skills',
+            name: 'Навыки',
+            x: 1000, y: 1450,
+            radius: 130,
+            type: 'skills',
+            content: [
+                { text: 'Навыки', size: 24, y: -85, font: 'Pirata One', color: colors.ink },
+                { text: '── Языки ──', size: 11, y: -55, color: colors.inkFaded },
+                { text: 'Python • C/C++ • Go', size: 13, y: -30, color: colors.inkLight },
+                { text: '── Базы данных ──', size: 11, y: -2, color: colors.inkFaded },
+                { text: 'PostgreSQL • YQL', size: 13, y: 22, color: colors.inkLight },
+                { text: '── Технологии ──', size: 11, y: 50, color: colors.inkFaded },
+                { text: 'Docker • Django', size: 13, y: 74, color: colors.inkLight },
+            ]
+        },
+        {
+            id: 'languages',
+            name: 'Языки',
+            x: 1800, y: 1500,
+            radius: 100,
+            type: 'skills',
+            content: [
+                { text: 'Языки', size: 22, y: -55, font: 'Pirata One', color: colors.ink },
+                { text: '─────', size: 12, y: -28, color: colors.inkFaded },
+                { text: 'Русский — родной', size: 12, y: -2, color: colors.inkLight },
+                { text: 'English — B1', size: 12, y: 22, color: colors.inkLight },
+            ]
+        },
+    ];
 
-            // Projects zone (right side)
-            { x: 780, y: 180, text: 'PROJECTS', size: 16, color: '#f97316', font: 'Press Start 2P' },
+    // Paths connecting locations (tree structure)
+    const paths = [
+        // Center to main branches
+        { from: 'center', to: 'csc', style: 'main' },
+        { from: 'center', to: 'yandex', style: 'main' },
+        { from: 'center', to: 'projects', style: 'main' },
+        { from: 'center', to: 'contacts', style: 'main' },
+        { from: 'center', to: 'skills', style: 'secondary' },
+        { from: 'center', to: 'languages', style: 'secondary' },
+        // Education branch
+        { from: 'csc', to: 'spbu', style: 'main' },
+        { from: 'csc', to: 'shad', style: 'main' },
+        // Experience branch
+        { from: 'yandex', to: 'gazprom', style: 'main' },
+    ];
 
-            { x: 780, y: 240, text: 'Protocol Detection Bot', size: 12, color: '#fff' },
-            { x: 780, y: 260, text: 'OCR & Digit Recognition', size: 10, color: '#aaa' },
+    // Treasure chest
+    const chest = { x: 180, y: 180, opened: false };
 
-            { x: 780, y: 310, text: 'RRT* Path Planning', size: 12, color: '#fff' },
-            { x: 780, y: 330, text: 'Algorithm Visualization', size: 10, color: '#aaa' },
+    // Decorative elements
+    const seaMonsters = [];
+    const waves = [];
+    const compass = { x: 2550, y: 1950 };
+    const stains = [];
+    const largeStains = [];
 
-            { x: 780, y: 380, text: 'EES Algorithm', size: 12, color: '#fff' },
-            { x: 780, y: 400, text: 'Suboptimal Search', size: 10, color: '#aaa' },
+    function initDecorations() {
+        // Sea monsters in corners
+        seaMonsters.push(
+            { x: 200, y: 1900, type: 'serpent', flip: false },
+            { x: 2600, y: 300, type: 'kraken', flip: true },
+        );
 
-            { x: 780, y: 450, text: 'Research Paper', size: 12, color: '#fff' },
-            { x: 780, y: 470, text: 'arxiv.org/abs/1904.06571', size: 9, color: '#4ecdc4' },
-
-            // Contact zone (bottom)
-            { x: 450, y: 580, text: 'kirill.kz20010@gmail.com', size: 11, color: '#4ecdc4' },
-            { x: 450, y: 605, text: 'github.com/bicikar', size: 11, color: '#aaa' },
-        ];
-
-        // Skill bars
-        const skillBars = [
-            { x: 350, y: 250, width: 80, level: 0.9, color: '#3498db' },  // Python
-            { x: 350, y: 300, width: 80, level: 0.8, color: '#e74c3c' },  // C++
-            { x: 350, y: 350, width: 80, level: 0.75, color: '#2ecc71' }, // PostgreSQL
-            { x: 550, y: 250, width: 80, level: 0.85, color: '#9b59b6' }, // ML
-            { x: 550, y: 300, width: 80, level: 0.8, color: '#f39c12' },  // Data Analysis
-            { x: 550, y: 350, width: 80, level: 0.7, color: '#1abc9c' },  // Algorithms
-        ];
-
-        // Collectible stars
-        const stars = [
-            { x: 50, y: 150, collected: false },
-            { x: 850, y: 150, collected: false },
-            { x: 450, y: 400, collected: false },
-            { x: 50, y: 550, collected: false },
-            { x: 850, y: 550, collected: false },
-        ];
-
-        // Secret chest
-        const chest = { x: 780, y: 520, opened: false, width: 40, height: 30 };
-
-        // Decorative elements
-        const trees = [
-            { x: 30, y: 80 }, { x: 70, y: 120 }, { x: 200, y: 100 },
-            { x: 700, y: 90 }, { x: 830, y: 80 }, { x: 870, y: 130 },
-            { x: 20, y: 400 }, { x: 250, y: 550 }, { x: 650, y: 550 },
-        ];
-
-        const flowers = [];
+        // Wave patterns for edges
         for (let i = 0; i < 30; i++) {
-            flowers.push({
-                x: Math.random() * 860 + 20,
-                y: Math.random() * 400 + 130,
-                color: ['#ff6b6b', '#ffd700', '#ff69b4', '#fff', '#4ecdc4'][Math.floor(Math.random() * 5)]
+            waves.push({
+                x: Math.random() * WORLD.width,
+                y: Math.random() < 0.5 ? Math.random() * 150 : WORLD.height - Math.random() * 150,
+                size: 20 + Math.random() * 30,
+                phase: Math.random() * Math.PI * 2
+            });
+        }
+        for (let i = 0; i < 20; i++) {
+            waves.push({
+                x: Math.random() < 0.5 ? Math.random() * 150 : WORLD.width - Math.random() * 150,
+                y: 200 + Math.random() * (WORLD.height - 400),
+                size: 20 + Math.random() * 30,
+                phase: Math.random() * Math.PI * 2
             });
         }
 
-        // Zones for visual separation
-        const zones = [
-            { x: 20, y: 160, w: 200, h: 400, color: 'rgba(255, 107, 107, 0.1)', border: '#ff6b6b' },  // Education
-            { x: 280, y: 160, w: 340, h: 220, color: 'rgba(78, 205, 196, 0.1)', border: '#4ecdc4' },  // Skills
-            { x: 680, y: 160, w: 200, h: 360, color: 'rgba(249, 115, 22, 0.1)', border: '#f97316' },  // Projects
-        ];
-
-        // Draw functions
-        function drawBackground() {
-            // Base grass
-            ctx.fillStyle = colors.grass;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Grass texture
-            ctx.fillStyle = colors.grassLight;
-            for (let i = 0; i < 200; i++) {
-                const x = (i * 47) % canvas.width;
-                const y = (i * 31) % canvas.height;
-                ctx.fillRect(x, y, 3, 8);
-            }
-
-            // Main path
-            ctx.fillStyle = colors.path;
-            ctx.fillRect(0, 550, canvas.width, 40);
-            ctx.fillRect(420, 130, 60, 420);
-
-            // Path texture
-            ctx.fillStyle = colors.pathDark;
-            for (let i = 0; i < 50; i++) {
-                ctx.fillRect(i * 20, 555, 8, 5);
-                ctx.fillRect(i * 20 + 5, 575, 6, 4);
-            }
-        }
-
-        function drawZones() {
-            zones.forEach(zone => {
-                ctx.fillStyle = zone.color;
-                ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
-                ctx.strokeStyle = zone.border;
-                ctx.lineWidth = 2;
-                ctx.setLineDash([5, 5]);
-                ctx.strokeRect(zone.x, zone.y, zone.w, zone.h);
-                ctx.setLineDash([]);
+        // Pre-generate stains for parchment texture
+        for (let i = 0; i < 500; i++) {
+            stains.push({
+                x: (i * 97) % WORLD.width,
+                y: (i * 73) % WORLD.height,
+                size: 1 + Math.random() * 3,
+                color: i % 3 === 0 ? '#8b7355' : '#c4a882'
             });
         }
 
-        function drawTrees() {
-            trees.forEach(tree => {
-                // Trunk
-                ctx.fillStyle = '#5d4037';
-                ctx.fillRect(tree.x + 8, tree.y + 20, 10, 15);
-                // Leaves
-                ctx.fillStyle = '#2e7d32';
-                ctx.beginPath();
-                ctx.arc(tree.x + 13, tree.y + 12, 18, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#388e3c';
-                ctx.beginPath();
-                ctx.arc(tree.x + 8, tree.y + 8, 12, 0, Math.PI * 2);
-                ctx.fill();
+        // Large stains
+        for (let i = 0; i < 15; i++) {
+            largeStains.push({
+                x: (i * 347) % WORLD.width,
+                y: (i * 251) % WORLD.height,
+                size: 20 + Math.random() * 40
             });
         }
+    }
+    initDecorations();
 
-        function drawFlowers() {
-            flowers.forEach(flower => {
-                // Skip if in zones
-                const inZone = zones.some(z =>
-                    flower.x > z.x && flower.x < z.x + z.w &&
-                    flower.y > z.y && flower.y < z.y + z.h
-                );
-                if (inZone) return;
+    function getLocation(id) {
+        return locations.find(l => l.id === id);
+    }
 
-                ctx.fillStyle = flower.color;
-                ctx.beginPath();
-                ctx.arc(flower.x, flower.y, 4, 0, Math.PI * 2);
-                ctx.fill();
-            });
-        }
+    function toScreen(x, y) {
+        return { x: x - camera.x, y: y - camera.y };
+    }
 
-        function drawSigns() {
-            signs.forEach(sign => {
-                ctx.font = `${sign.font ? '' : ''}${sign.size}px ${sign.font || 'Inter'}`;
-                ctx.fillStyle = sign.color;
-                ctx.textAlign = 'center';
-                ctx.fillText(sign.text, sign.x, sign.y);
-            });
-        }
+    // Drawing functions
+    function drawParchmentBackground() {
+        // Base parchment color
+        const grad = ctx.createRadialGradient(
+            canvas.width / 2, canvas.height / 2, 0,
+            canvas.width / 2, canvas.height / 2, canvas.width * 0.8
+        );
+        grad.addColorStop(0, colors.parchmentLight);
+        grad.addColorStop(0.5, colors.parchment);
+        grad.addColorStop(1, colors.parchmentDark);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        function drawSkillBars() {
-            skillBars.forEach(bar => {
-                // Background
-                ctx.fillStyle = 'rgba(255,255,255,0.2)';
-                ctx.fillRect(bar.x, bar.y, bar.width, 12);
-                // Fill
-                ctx.fillStyle = bar.color;
-                ctx.fillRect(bar.x, bar.y, bar.width * bar.level, 12);
-                // Border
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(bar.x, bar.y, bar.width, 12);
-                // Percentage
-                ctx.font = '10px Inter';
-                ctx.fillStyle = '#fff';
-                ctx.textAlign = 'left';
-                ctx.fillText(`${Math.round(bar.level * 100)}%`, bar.x + bar.width + 5, bar.y + 10);
-            });
-        }
-
-        function drawStars() {
-            const time = Date.now() / 500;
-            stars.forEach((star, i) => {
-                if (star.collected) return;
-
-                const bounce = Math.sin(time + i) * 3;
-                const size = 15;
-
-                // Glow
-                ctx.beginPath();
-                ctx.arc(star.x, star.y + bounce, size + 5, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
-                ctx.fill();
-
-                // Star shape
-                ctx.fillStyle = '#ffd700';
-                ctx.beginPath();
-                for (let j = 0; j < 5; j++) {
-                    const angle = (j * 4 * Math.PI) / 5 - Math.PI / 2;
-                    const x = star.x + Math.cos(angle) * size;
-                    const y = star.y + bounce + Math.sin(angle) * size;
-                    if (j === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.closePath();
-                ctx.fill();
-
-                // Inner
-                ctx.fillStyle = '#ffeb3b';
-                ctx.beginPath();
-                ctx.arc(star.x, star.y + bounce, 5, 0, Math.PI * 2);
-                ctx.fill();
-            });
-        }
-
-        function drawChest() {
-            const x = chest.x;
-            const y = chest.y;
-
-            // Shadow
-            ctx.fillStyle = 'rgba(0,0,0,0.3)';
-            ctx.fillRect(x - 2, y + 25, 44, 8);
-
-            if (chest.opened) {
-                // Open chest
-                ctx.fillStyle = '#8B4513';
-                ctx.fillRect(x, y + 10, 40, 20);
-                // Lid open
-                ctx.fillStyle = '#A0522D';
-                ctx.fillRect(x - 2, y - 5, 44, 15);
-                // Gold inside
-                ctx.fillStyle = '#ffd700';
-                ctx.beginPath();
-                ctx.arc(x + 12, y + 18, 5, 0, Math.PI * 2);
-                ctx.arc(x + 22, y + 16, 4, 0, Math.PI * 2);
-                ctx.arc(x + 30, y + 18, 5, 0, Math.PI * 2);
-                ctx.fill();
-            } else {
-                // Closed chest
-                ctx.fillStyle = '#8B4513';
-                ctx.fillRect(x, y, 40, 30);
-                // Lid
-                ctx.fillStyle = '#A0522D';
-                ctx.fillRect(x - 2, y - 5, 44, 12);
-                // Lock
-                ctx.fillStyle = '#ffd700';
-                ctx.fillRect(x + 16, y + 8, 8, 10);
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(x + 20, y + 14, 2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Hint if player nearby
-                const dist = Math.sqrt(Math.pow(player.x - x - 20, 2) + Math.pow(player.y - y - 15, 2));
-                if (dist < 60) {
-                    ctx.font = '10px Press Start 2P';
-                    ctx.fillStyle = '#ffd700';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('Press SPACE', x + 20, y - 20);
-                }
-            }
-        }
-
-        function drawPlayer() {
-            const bounce = Math.sin(Date.now() / 150) * (keys.up || keys.down || keys.left || keys.right ? 2 : 0);
-
-            // Shadow
-            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        // Parchment texture - stains and aging (pre-generated)
+        ctx.globalAlpha = 0.03;
+        stains.forEach(stain => {
+            const s = toScreen(stain.x, stain.y);
+            if (s.x < -10 || s.x > canvas.width + 10 || s.y < -10 || s.y > canvas.height + 10) return;
+            ctx.fillStyle = stain.color;
             ctx.beginPath();
-            ctx.ellipse(player.x, player.y + 12, 12, 5, 0, 0, Math.PI * 2);
+            ctx.arc(s.x, s.y, stain.size, 0, Math.PI * 2);
             ctx.fill();
+        });
 
-            // Body
-            ctx.fillStyle = '#4a90d9';
-            ctx.fillRect(player.x - 8, player.y - 8 + bounce, 16, 16);
+        // Larger stains (pre-generated)
+        ctx.globalAlpha = 0.02;
+        largeStains.forEach(stain => {
+            const s = toScreen(stain.x, stain.y);
+            if (s.x < -50 || s.x > canvas.width + 50 || s.y < -50 || s.y > canvas.height + 50) return;
+            ctx.fillStyle = '#6b5344';
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, stain.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1;
 
-            // Head
-            ctx.fillStyle = '#ffdbac';
-            ctx.fillRect(player.x - 6, player.y - 18 + bounce, 12, 12);
+        // Grid lines (faint)
+        ctx.strokeStyle = 'rgba(139, 115, 85, 0.08)';
+        ctx.lineWidth = 1;
+        const gridSize = 100;
+        const offsetX = -camera.x % gridSize;
+        const offsetY = -camera.y % gridSize;
 
-            // Hair
-            ctx.fillStyle = '#4a3728';
-            ctx.fillRect(player.x - 7, player.y - 20 + bounce, 14, 5);
-
-            // Eyes
-            ctx.fillStyle = '#000';
-            ctx.fillRect(player.x - 4, player.y - 14 + bounce, 2, 2);
-            ctx.fillRect(player.x + 2, player.y - 14 + bounce, 2, 2);
+        for (let x = offsetX; x < canvas.width; x += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
         }
-
-        function drawTitle() {
-            // Name plate at top
-            ctx.fillStyle = 'rgba(0,0,0,0.7)';
-            ctx.fillRect(300, 40, 300, 90);
-            ctx.strokeStyle = '#ffd700';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(300, 40, 300, 90);
-
-            ctx.font = 'bold 28px Inter';
-            ctx.fillStyle = '#fff';
-            ctx.textAlign = 'center';
-            ctx.fillText('KIRILL KUZNETSOV', 450, 75);
+        for (let y = offsetY; y < canvas.height; y += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
         }
+    }
 
-        function render() {
-            drawBackground();
-            drawZones();
-            drawFlowers();
-            drawTrees();
-            drawSigns();
-            drawSkillBars();
-            drawStars();
-            drawChest();
-            drawPlayer();
-            drawTitle();
-        }
+    function drawWaves() {
+        waves.forEach(wave => {
+            const s = toScreen(wave.x, wave.y);
+            if (s.x < -50 || s.x > canvas.width + 50 || s.y < -50 || s.y > canvas.height + 50) return;
 
-        function updatePlayer() {
-            if (showingSecret) return;
+            const wobble = Math.sin(time * 0.5 + wave.phase) * 3;
 
-            let dx = 0, dy = 0;
-            if (keys.up) dy = -player.speed;
-            if (keys.down) dy = player.speed;
-            if (keys.left) dx = -player.speed;
-            if (keys.right) dx = player.speed;
+            ctx.strokeStyle = colors.inkFaded;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(s.x - wave.size, s.y + wobble);
+            ctx.quadraticCurveTo(s.x - wave.size * 0.5, s.y - 8 + wobble, s.x, s.y + wobble);
+            ctx.quadraticCurveTo(s.x + wave.size * 0.5, s.y + 8 + wobble, s.x + wave.size, s.y + wobble);
+            ctx.stroke();
+        });
+    }
 
-            // Normalize diagonal
-            if (dx !== 0 && dy !== 0) {
-                dx *= 0.707;
-                dy *= 0.707;
-            }
+    function drawSeaMonsters() {
+        seaMonsters.forEach(monster => {
+            const s = toScreen(monster.x, monster.y);
+            if (s.x < -150 || s.x > canvas.width + 150 || s.y < -150 || s.y > canvas.height + 150) return;
 
-            const newX = player.x + dx;
-            const newY = player.y + dy;
+            ctx.save();
+            ctx.translate(s.x, s.y);
+            if (monster.flip) ctx.scale(-1, 1);
 
-            // Bounds
-            if (newX > 20 && newX < canvas.width - 20) player.x = newX;
-            if (newY > 140 && newY < canvas.height - 30) player.y = newY;
-        }
+            const wobble = Math.sin(time * 0.3) * 5;
 
-        function checkCollectibles() {
-            stars.forEach(star => {
-                if (star.collected) return;
-                const dist = Math.sqrt(Math.pow(player.x - star.x, 2) + Math.pow(player.y - star.y, 2));
-                if (dist < 25) {
-                    star.collected = true;
-                    collectedStars++;
-                    document.getElementById('collectibles').textContent = `Stars: ${collectedStars}/5`;
+            if (monster.type === 'serpent') {
+                // Sea serpent
+                ctx.strokeStyle = colors.inkLight;
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
 
-                    if (collectedStars === 5) {
-                        showSecret("You found all stars! Fun fact: Kirill's first program was a calculator in Pascal, written in 2015.");
+                // Body waves
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                for (let i = 1; i <= 5; i++) {
+                    const px = i * 25;
+                    const py = Math.sin(i + time * 0.5) * 15;
+                    ctx.lineTo(px, py + wobble);
+                }
+                ctx.stroke();
+
+                // Head
+                ctx.fillStyle = colors.inkLight;
+                ctx.beginPath();
+                ctx.arc(-5, wobble, 12, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Eye
+                ctx.fillStyle = colors.parchment;
+                ctx.beginPath();
+                ctx.arc(-8, wobble - 3, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Spikes
+                ctx.fillStyle = colors.inkFaded;
+                for (let i = 0; i < 4; i++) {
+                    const px = i * 30 + 10;
+                    const py = Math.sin(i + 0.5 + time * 0.5) * 15 + wobble;
+                    ctx.beginPath();
+                    ctx.moveTo(px - 5, py);
+                    ctx.lineTo(px, py - 12);
+                    ctx.lineTo(px + 5, py);
+                    ctx.fill();
+                }
+            } else {
+                // Kraken tentacles
+                ctx.strokeStyle = colors.inkLight;
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+
+                for (let t = 0; t < 4; t++) {
+                    const angle = (t / 4) * Math.PI * 0.6 - Math.PI * 0.3;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+
+                    let px = 0, py = 0;
+                    for (let i = 1; i <= 4; i++) {
+                        px += Math.cos(angle) * 20 + Math.sin(time * 0.5 + t + i) * 8;
+                        py += Math.sin(angle) * 20 + Math.cos(time * 0.4 + t + i) * 5;
+                        ctx.lineTo(px, py);
+                    }
+                    ctx.stroke();
+
+                    // Suckers
+                    ctx.fillStyle = colors.parchmentDark;
+                    for (let i = 1; i <= 3; i++) {
+                        const sx = Math.cos(angle) * 20 * i + Math.sin(time * 0.5 + t + i) * 8 * 0.5;
+                        const sy = Math.sin(angle) * 20 * i + Math.cos(time * 0.4 + t + i) * 5 * 0.5;
+                        ctx.beginPath();
+                        ctx.arc(sx, sy, 3, 0, Math.PI * 2);
+                        ctx.fill();
                     }
                 }
+
+                // Head
+                ctx.fillStyle = colors.inkLight;
+                ctx.beginPath();
+                ctx.ellipse(0, -20, 25, 30, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Eyes
+                ctx.fillStyle = colors.gold;
+                ctx.beginPath();
+                ctx.arc(-10, -25, 5, 0, Math.PI * 2);
+                ctx.arc(10, -25, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        });
+    }
+
+    function drawCompass() {
+        const s = toScreen(compass.x, compass.y);
+        if (s.x < -80 || s.x > canvas.width + 80 || s.y < -80 || s.y > canvas.height + 80) return;
+
+        const size = 70;
+
+        // Outer ring
+        ctx.strokeStyle = colors.ink;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, size, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, size - 8, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Cardinal directions
+        const directions = ['N', 'E', 'S', 'W'];
+        ctx.font = '16px "Pirata One"';
+        ctx.fillStyle = colors.ink;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        directions.forEach((dir, i) => {
+            const angle = (i * Math.PI / 2) - Math.PI / 2;
+            const dx = s.x + Math.cos(angle) * (size - 20);
+            const dy = s.y + Math.sin(angle) * (size - 20);
+            ctx.fillText(dir, dx, dy);
+        });
+
+        // Compass star
+        ctx.fillStyle = colors.ink;
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI / 4) - Math.PI / 2;
+            const r = i % 2 === 0 ? size - 35 : size - 50;
+            const x = s.x + Math.cos(angle) * r;
+            const y = s.y + Math.sin(angle) * r;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fill();
+
+        // North pointer (red)
+        ctx.fillStyle = colors.red;
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y - size + 35);
+        ctx.lineTo(s.x - 6, s.y);
+        ctx.lineTo(s.x + 6, s.y);
+        ctx.closePath();
+        ctx.fill();
+
+        // Center
+        ctx.fillStyle = colors.gold;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function drawPaths() {
+        paths.forEach(path => {
+            const from = getLocation(path.from);
+            const to = getLocation(path.to);
+            if (!from || !to) return;
+
+            const s1 = toScreen(from.x, from.y);
+            const s2 = toScreen(to.x, to.y);
+
+            // Dotted line style for treasure map
+            ctx.strokeStyle = colors.inkFaded;
+            ctx.lineWidth = path.style === 'main' ? 2.5 : 1.5;
+            ctx.setLineDash(path.style === 'main' ? [12, 8] : [6, 6]);
+            ctx.lineCap = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(s1.x, s1.y);
+            ctx.lineTo(s2.x, s2.y);
+            ctx.stroke();
+
+            ctx.setLineDash([]);
+        });
+    }
+
+    function drawLocations() {
+        const sorted = [...locations].sort((a, b) => a.y - b.y);
+
+        sorted.forEach(loc => {
+            const s = toScreen(loc.x, loc.y);
+            if (s.x < -250 || s.x > canvas.width + 250 || s.y < -250 || s.y > canvas.height + 250) return;
+
+            // Location circle with decorative border
+            ctx.strokeStyle = colors.ink;
+            ctx.lineWidth = 2;
+
+            // Outer decorative circle
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, loc.radius + 10, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Inner circle
+            ctx.strokeStyle = colors.inkFaded;
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, loc.radius - 5, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Small decorative marks around circle
+            if (loc.type === 'center') {
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    const x1 = s.x + Math.cos(angle) * (loc.radius + 5);
+                    const y1 = s.y + Math.sin(angle) * (loc.radius + 5);
+                    const x2 = s.x + Math.cos(angle) * (loc.radius + 15);
+                    const y2 = s.y + Math.sin(angle) * (loc.radius + 15);
+                    ctx.strokeStyle = colors.inkFaded;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                }
+            }
+
+            // Type-specific decoration
+            if (loc.type === 'education') {
+                // Book icon
+                ctx.fillStyle = colors.inkFaded;
+                ctx.fillRect(s.x - 8, s.y - loc.radius + 15, 16, 12);
+                ctx.strokeStyle = colors.parchment;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(s.x, s.y - loc.radius + 15);
+                ctx.lineTo(s.x, s.y - loc.radius + 27);
+                ctx.stroke();
+            } else if (loc.type === 'experience') {
+                // Anchor icon
+                ctx.strokeStyle = colors.inkFaded;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y - loc.radius + 22, 6, Math.PI, 0);
+                ctx.moveTo(s.x, s.y - loc.radius + 16);
+                ctx.lineTo(s.x, s.y - loc.radius + 35);
+                ctx.moveTo(s.x - 8, s.y - loc.radius + 32);
+                ctx.lineTo(s.x + 8, s.y - loc.radius + 32);
+                ctx.stroke();
+            }
+
+            // Content text
+            if (loc.content) {
+                loc.content.forEach(item => {
+                    const font = item.font || 'Spectral';
+                    const style = item.italic ? 'italic ' : '';
+                    ctx.font = `${style}${item.size}px "${font}", serif`;
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = item.color || colors.ink;
+                    ctx.fillText(item.text, s.x, s.y + item.y);
+                });
+            }
+        });
+    }
+
+    function drawChest() {
+        const s = toScreen(chest.x, chest.y);
+        if (s.x < -60 || s.x > canvas.width + 60 || s.y < -60 || s.y > canvas.height + 60) return;
+
+        // X marks the spot
+        ctx.strokeStyle = colors.red;
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(s.x - 25, s.y - 25);
+        ctx.lineTo(s.x + 25, s.y + 25);
+        ctx.moveTo(s.x + 25, s.y - 25);
+        ctx.lineTo(s.x - 25, s.y + 25);
+        ctx.stroke();
+
+        if (!chest.opened) {
+            // Chest closed
+            ctx.fillStyle = colors.inkLight;
+            ctx.fillRect(s.x - 20, s.y + 10, 40, 25);
+
+            // Lid
+            ctx.beginPath();
+            ctx.moveTo(s.x - 22, s.y + 10);
+            ctx.quadraticCurveTo(s.x, s.y - 5, s.x + 22, s.y + 10);
+            ctx.fill();
+
+            // Lock
+            ctx.fillStyle = colors.gold;
+            ctx.fillRect(s.x - 5, s.y + 15, 10, 10);
+
+            // Hint
+            const dist = Math.hypot(player.x - chest.x, player.y - chest.y);
+            if (dist < 80) {
+                ctx.font = '12px "Spectral"';
+                ctx.fillStyle = colors.red;
+                ctx.textAlign = 'center';
+                ctx.fillText('SPACE', s.x, s.y + 55);
+            }
+        } else {
+            // Chest open with gold
+            ctx.fillStyle = colors.inkLight;
+            ctx.fillRect(s.x - 20, s.y + 15, 40, 20);
+
+            // Open lid
+            ctx.fillRect(s.x - 22, s.y - 10, 44, 15);
+
+            // Gold coins
+            ctx.fillStyle = colors.gold;
+            ctx.beginPath();
+            ctx.arc(s.x - 8, s.y + 22, 5, 0, Math.PI * 2);
+            ctx.arc(s.x + 5, s.y + 20, 6, 0, Math.PI * 2);
+            ctx.arc(s.x + 2, s.y + 28, 4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function drawPlayer() {
+        const s = toScreen(player.x, player.y);
+        const moving = keys.up || keys.down || keys.left || keys.right;
+        const bob = moving ? Math.sin(time * 10) * 2 : 0;
+
+        // Shadow (ink blot style)
+        ctx.fillStyle = 'rgba(61, 41, 20, 0.2)';
+        ctx.beginPath();
+        ctx.ellipse(s.x, s.y + 15, 12, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Simple figure (map marker style)
+        // Body/cloak
+        ctx.fillStyle = colors.ink;
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y - 18 + bob);
+        ctx.lineTo(s.x - 10, s.y + 12);
+        ctx.lineTo(s.x + 10, s.y + 12);
+        ctx.closePath();
+        ctx.fill();
+
+        // Head
+        ctx.fillStyle = colors.parchmentLight;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y - 22 + bob, 8, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = colors.ink;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y - 22 + bob, 8, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Hat
+        ctx.fillStyle = colors.ink;
+        ctx.beginPath();
+        ctx.moveTo(s.x - 12, s.y - 26 + bob);
+        ctx.lineTo(s.x, s.y - 38 + bob);
+        ctx.lineTo(s.x + 12, s.y - 26 + bob);
+        ctx.closePath();
+        ctx.fill();
+
+        // Eyes
+        ctx.fillStyle = colors.ink;
+        ctx.beginPath();
+        ctx.arc(s.x - 3, s.y - 23 + bob, 1.5, 0, Math.PI * 2);
+        ctx.arc(s.x + 3, s.y - 23 + bob, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function drawBorder() {
+        // Ornate border
+        ctx.strokeStyle = colors.ink;
+        ctx.lineWidth = 4;
+
+        // Main border
+        const margin = 30;
+        const bx = -camera.x + margin;
+        const by = -camera.y + margin;
+        const bw = WORLD.width - margin * 2;
+        const bh = WORLD.height - margin * 2;
+
+        const s1 = toScreen(margin, margin);
+        const s2 = toScreen(WORLD.width - margin, WORLD.height - margin);
+
+        if (s1.x < canvas.width && s2.x > 0 && s1.y < canvas.height && s2.y > 0) {
+            ctx.strokeRect(
+                Math.max(0, s1.x),
+                Math.max(0, s1.y),
+                Math.min(canvas.width, s2.x) - Math.max(0, s1.x),
+                Math.min(canvas.height, s2.y) - Math.max(0, s1.y)
+            );
+
+            // Corner decorations
+            const corners = [
+                { x: margin + 15, y: margin + 15 },
+                { x: WORLD.width - margin - 15, y: margin + 15 },
+                { x: margin + 15, y: WORLD.height - margin - 15 },
+                { x: WORLD.width - margin - 15, y: WORLD.height - margin - 15 },
+            ];
+
+            corners.forEach(corner => {
+                const sc = toScreen(corner.x, corner.y);
+                if (sc.x > -20 && sc.x < canvas.width + 20 && sc.y > -20 && sc.y < canvas.height + 20) {
+                    ctx.fillStyle = colors.ink;
+                    ctx.beginPath();
+                    ctx.arc(sc.x, sc.y, 8, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = colors.gold;
+                    ctx.beginPath();
+                    ctx.arc(sc.x, sc.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             });
         }
 
-        function openChest() {
-            const dist = Math.sqrt(Math.pow(player.x - chest.x - 20, 2) + Math.pow(player.y - chest.y - 15, 2));
-            if (dist < 60 && !chest.opened) {
-                chest.opened = true;
-                showSecret("Bonus info: Besides coding, Kirill enjoys solving algorithmic puzzles and exploring new ML techniques!");
-            }
+        // Title cartouche at top
+        const titleX = WORLD.width / 2;
+        const titleY = 80;
+        const ts = toScreen(titleX, titleY);
+
+        if (ts.x > -150 && ts.x < canvas.width + 150 && ts.y > -50 && ts.y < canvas.height + 50) {
+            // Banner
+            ctx.fillStyle = colors.parchmentLight;
+            ctx.strokeStyle = colors.ink;
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            ctx.moveTo(ts.x - 120, ts.y - 20);
+            ctx.lineTo(ts.x + 120, ts.y - 20);
+            ctx.lineTo(ts.x + 130, ts.y);
+            ctx.lineTo(ts.x + 120, ts.y + 20);
+            ctx.lineTo(ts.x - 120, ts.y + 20);
+            ctx.lineTo(ts.x - 130, ts.y);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = '22px "Pirata One"';
+            ctx.fillStyle = colors.ink;
+            ctx.textAlign = 'center';
+            ctx.fillText('CURRICULUM VITAE', ts.x, ts.y + 7);
         }
+    }
 
-        function showSecret(text) {
-            showingSecret = true;
-            document.getElementById('secretText').textContent = text;
-            document.getElementById('secretPopup').classList.add('show');
-        }
+    function render() {
+        drawParchmentBackground();
+        drawBorder();
+        drawWaves();
+        drawPaths();
+        drawSeaMonsters();
+        drawCompass();
+        drawLocations();
+        drawChest();
+        drawPlayer();
+    }
 
-        function hideSecret() {
-            showingSecret = false;
-            document.getElementById('secretPopup').classList.remove('show');
-        }
+    function updateCamera() {
+        const targetX = player.x - canvas.width / 2;
+        const targetY = player.y - canvas.height / 2;
+        camera.x += (targetX - camera.x) * 0.08;
+        camera.y += (targetY - camera.y) * 0.08;
+        camera.x = Math.max(0, Math.min(camera.x, WORLD.width - canvas.width));
+        camera.y = Math.max(0, Math.min(camera.y, WORLD.height - canvas.height));
+    }
 
-        function gameLoop() {
-            updatePlayer();
-            checkCollectibles();
-            render();
-            requestAnimationFrame(gameLoop);
-        }
+    function updatePlayer() {
+        if (showingPopup) return;
 
-        // Input
-        document.addEventListener('keydown', (e) => {
-            if (showingSecret) {
-                hideSecret();
-                return;
-            }
+        let dx = 0, dy = 0;
+        if (keys.up) dy = -player.speed;
+        if (keys.down) dy = player.speed;
+        if (keys.left) dx = -player.speed;
+        if (keys.right) dx = player.speed;
 
-            switch(e.key.toLowerCase()) {
-                case 'w': case 'arrowup': keys.up = true; break;
-                case 's': case 'arrowdown': keys.down = true; break;
-                case 'a': case 'arrowleft': keys.left = true; break;
-                case 'd': case 'arrowright': keys.right = true; break;
-                case ' ': openChest(); break;
+        if (dx && dy) { dx *= 0.707; dy *= 0.707; }
+
+        const nx = player.x + dx;
+        const ny = player.y + dy;
+
+        if (nx > 60 && nx < WORLD.width - 60) player.x = nx;
+        if (ny > 60 && ny < WORLD.height - 60) player.y = ny;
+    }
+
+    function updateLocationName() {
+        let name = 'Карта';
+        let minDist = 180;
+        locations.forEach(loc => {
+            const dist = Math.hypot(player.x - loc.x, player.y - loc.y);
+            if (dist < minDist) {
+                minDist = dist;
+                name = loc.name;
             }
         });
+        document.getElementById('locationTitle').textContent = name;
+    }
 
-        document.addEventListener('keyup', (e) => {
-            switch(e.key.toLowerCase()) {
-                case 'w': case 'arrowup': keys.up = false; break;
-                case 's': case 'arrowdown': keys.down = false; break;
-                case 'a': case 'arrowleft': keys.left = false; break;
-                case 'd': case 'arrowright': keys.right = false; break;
-            }
-        });
+    function openChest() {
+        const dist = Math.hypot(player.x - chest.x, player.y - chest.y);
+        if (dist < 80 && !chest.opened) {
+            chest.opened = true;
+            showPopup('СОКРОВИЩЕ', 'Первая программа Кирилла — калькулятор на Pascal (2015). Сейчас он исследует квантовые вычисления с Qiskit и тензорные сети для оптимизационных задач.');
+        }
+    }
 
-        // Start
-        gameLoop();
+    function showPopup(title, text) {
+        showingPopup = true;
+        document.getElementById('popupTitle').textContent = title;
+        document.getElementById('popupText').textContent = text;
+        document.getElementById('popup').classList.add('active');
+    }
+
+    function hidePopup() {
+        showingPopup = false;
+        document.getElementById('popup').classList.remove('active');
+    }
+
+    function gameLoop() {
+        time += 0.016;
+        updatePlayer();
+        updateCamera();
+        updateLocationName();
+        render();
+        requestAnimationFrame(gameLoop);
+    }
+
+    // Input
+    document.addEventListener('keydown', e => {
+        if (showingPopup) { hidePopup(); return; }
+
+        const key = e.key.toLowerCase();
+        if (['w', 'ц', 'arrowup'].includes(key)) { keys.up = true; e.preventDefault(); }
+        if (['s', 'ы', 'arrowdown'].includes(key)) { keys.down = true; e.preventDefault(); }
+        if (['a', 'ф', 'arrowleft'].includes(key)) { keys.left = true; e.preventDefault(); }
+        if (['d', 'в', 'arrowright'].includes(key)) { keys.right = true; e.preventDefault(); }
+        if (key === ' ') { openChest(); e.preventDefault(); }
+    });
+
+    document.addEventListener('keyup', e => {
+        const key = e.key.toLowerCase();
+        if (['w', 'ц', 'arrowup'].includes(key)) keys.up = false;
+        if (['s', 'ы', 'arrowdown'].includes(key)) keys.down = false;
+        if (['a', 'ф', 'arrowleft'].includes(key)) keys.left = false;
+        if (['d', 'в', 'arrowright'].includes(key)) keys.right = false;
+    });
+
+    // Start
+    camera.x = player.x - canvas.width / 2;
+    camera.y = player.y - canvas.height / 2;
+    gameLoop();
     </script>
 </body>
 </html>
