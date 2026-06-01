@@ -1,0 +1,335 @@
+/* ===== CSS Variables (Color Palette) ===== */
+:root {
+    --color-cream: #F5F2E8;
+    --color-orange: #D4883B;
+    --color-mustard: #E5B85A;
+    --color-olive: #C5CB8B;
+    --color-gray-blue: #9BABB3;
+    --color-terracotta: #A63D2F;
+    --color-black: #1A1A1A;
+    --color-white: #FFFFFF;
+
+    --font-main: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    --container-width: 1100px;
+    --spacing-sm: 1rem;
+    --spacing-md: 2rem;
+    --spacing-lg: 4rem;
+    --spacing-xl: 6rem;
+}
+
+/* ===== Reset & Base ===== */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-main);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-black);
+    background-color: var(--color-cream);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+/* ===== Container ===== */
+.container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+/* ===== Hero Section ===== */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--spacing-lg) 0;
+    position: relative;
+}
+
+.hero__logo {
+    width: 180px;
+    height: auto;
+    margin: 0 auto var(--spacing-md);
+}
+
+.hero__title {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: var(--spacing-sm);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero__subtitle {
+    font-size: 1.125rem;
+    color: var(--color-gray-blue);
+    font-weight: 400;
+    margin-bottom: var(--spacing-lg);
+}
+
+.hero__scroll {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-orange);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: transform 0.3s ease;
+}
+
+.hero__scroll:hover {
+    transform: translateY(4px);
+}
+
+.hero__scroll svg {
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(6px);
+    }
+    60% {
+        transform: translateY(3px);
+    }
+}
+
+/* ===== About Section ===== */
+.about {
+    padding: var(--spacing-xl) 0;
+    background-color: var(--color-white);
+}
+
+.about__badge {
+    display: inline-block;
+    background-color: var(--color-orange);
+    color: var(--color-white);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-md);
+}
+
+.about__title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+}
+
+.about__text {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: #444;
+    max-width: 700px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.about__text:last-child {
+    margin-bottom: 0;
+}
+
+.about__text strong {
+    color: var(--color-black);
+}
+
+/* ===== Guide Section ===== */
+.guide {
+    padding: var(--spacing-xl) 0;
+}
+
+.guide__content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    align-items: center;
+}
+
+.guide__title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+}
+
+.guide__text {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: #444;
+    margin-bottom: var(--spacing-md);
+}
+
+.guide__text strong {
+    color: var(--color-orange);
+}
+
+.guide__features {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.guide__features li {
+    position: relative;
+    padding-left: 1.5rem;
+    font-size: 1rem;
+    color: #444;
+}
+
+.guide__features li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-orange);
+    border-radius: 50%;
+}
+
+.guide__image {
+    display: flex;
+    justify-content: center;
+}
+
+.guide__image img {
+    max-height: 500px;
+    width: auto;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== CTA Section ===== */
+.cta {
+    padding: var(--spacing-xl) 0;
+    background-color: var(--color-white);
+    text-align: center;
+}
+
+.cta__mascot {
+    width: 140px;
+    height: auto;
+    margin: 0 auto var(--spacing-md);
+}
+
+.cta__title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+.cta__text {
+    font-size: 1.0625rem;
+    color: #666;
+    margin-bottom: var(--spacing-md);
+}
+
+.cta__button {
+    display: inline-block;
+    background-color: var(--color-orange);
+    color: var(--color-white);
+    padding: 1rem 2.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.cta__button:hover {
+    background-color: var(--color-terracotta);
+    transform: translateY(-2px);
+}
+
+/* ===== Footer ===== */
+.footer {
+    padding: var(--spacing-md) 0;
+    background-color: var(--color-black);
+    color: var(--color-cream);
+    text-align: center;
+}
+
+.footer__copyright {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.footer__project {
+    font-size: 0.75rem;
+    color: var(--color-gray-blue);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .hero__logo {
+        width: 140px;
+    }
+
+    .guide__content {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .guide__image {
+        order: -1;
+    }
+
+    .guide__image img {
+        max-height: 400px;
+    }
+
+    .cta__mascot {
+        width: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --spacing-lg: 3rem;
+        --spacing-xl: 4rem;
+    }
+
+    .hero__logo {
+        width: 120px;
+    }
+
+    .about__badge {
+        font-size: 0.75rem;
+    }
+
+    .cta__button {
+        width: 100%;
+        max-width: 300px;
+    }
+}
