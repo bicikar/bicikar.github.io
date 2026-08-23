@@ -39,6 +39,7 @@
 }
 
 :root {
+  color-scheme: only light;
   --paper: #f7f7f7;
   --orange: #f55e2b;
   --orange-dark: #df4818;
@@ -681,13 +682,54 @@ h3 {
 }
 
 .partner-mark {
+  position: relative;
+  isolation: isolate;
   width: 112px;
   height: 112px;
   display: grid;
   place-items: center;
+  overflow: hidden;
   border-radius: 50%;
   font-family: "Cy Grotesk Grand", sans-serif;
   font-size: 28px;
+}
+
+.partner-mark__fallback {
+  position: relative;
+  z-index: 0;
+}
+
+.partner-logo {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--white);
+}
+
+.partner-logo--cover {
+  object-fit: cover;
+}
+
+.partner-logo--contain {
+  object-fit: contain;
+}
+
+.partner-logo--pink {
+  background: #e5abd9;
+}
+
+.partner-logo--vertical {
+  padding: 6px 18px;
+}
+
+.partner-logo--wide {
+  padding: 12px 5px;
+}
+
+.partner-logo[hidden] {
+  display: none;
 }
 
 .partner-mark--orange {
@@ -901,6 +943,7 @@ h3 {
 
 .form-status[data-state="success"] {
   color: #19864d;
+  font-size: 15px;
   font-weight: 800;
 }
 

@@ -321,6 +321,18 @@ if (guestGrid) {
 const feedbackForm = document.querySelector("#feedbackForm");
 const formStatus = document.querySelector("#formStatus");
 
+document.querySelectorAll(".partner-logo").forEach((logo) => {
+  const showFallback = () => {
+    logo.hidden = true;
+  };
+
+  if (logo.complete && !logo.naturalWidth) {
+    showFallback();
+  } else {
+    logo.addEventListener("error", showFallback, { once: true });
+  }
+});
+
 feedbackForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
